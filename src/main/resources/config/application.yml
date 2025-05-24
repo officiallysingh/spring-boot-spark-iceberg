@@ -13,6 +13,8 @@
 spring:
   application:
     name: spring-boot-spark-iceberg
+  profiles:
+    include: ${CATALOG_TYPE:none}-catalog
   docker:
     compose:
       enabled: false
@@ -57,14 +59,6 @@ spring:
 #------------------------- Swagger configuration -------------------------
 springdoc:
   show-actuator: true
-  group-configs:
-    - group: actuator
-      display-name: Actuator
-      paths-to-match: /actuator/**
-    - group: iceberg
-      display-name: Iceberg
-      paths-to-match: /**
-      paths-to-exclude: /actuator/**
   swagger-ui:
     syntaxHighlight:
       activated: true
@@ -112,20 +106,6 @@ spark:
   sql:
     datetime.java8API.enabled: true
     session.timeZone: "+05:30"
-    #    extensions: org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions
-    #    - org.projectnessie.spark.extensions.NessieSparkSessionExtensions
-    #    extensions: org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions
-#    defaultCatalog: local
-    #    Catalog name is local, can be set to any value
-#    catalog:
-#      local: org.apache.iceberg.spark.SparkCatalog
-#      local.type: nessie
-#      local.warehouse: s3a://my-bucket
-#      local.uri: http://localhost:19120/api/v1
-#      local.default-namespace: ksoot
-##      local.ref: "main"
-#      local.io-impl: org.apache.iceberg.aws.s3.S3FileIO
-
 #  hadoop:
 #    fs:
 #      s3a:
@@ -137,3 +117,72 @@ spark:
 #        path.style.access: true  # For path-style access, useful in some S3-compatible services
 #        connection.ssl.enabled: false  # Enable SSL
 #        fast.upload: true  # Enable faster uploads
+
+
+#----------------- Iceberg Catalog configurations ----------------
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  Add VM Argument -DCATALOG_TYPE=hadoop to activate this profile  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+---
+spring.config.activate.on-profile: hadoop-catalog
+#----------------- Hadoop Iceberg Catalog configurations ----------------
+spark:
+  sql:
+    catalog:
+      hadoop: org.apache.iceberg.spark.SparkCatalog
+      hadoop.type: hadoop
+      hadoop.warehouse: ${CATALOG_WAREHOUSE:hdfs://localhost:9000/warehouse}
+      hadoop.uri: ${CATALOG_URI:hdfs://localhost:9000}
+      hadoop.default-namespace: ${CATALOG_NAMESPACE:ksoot}
+      hadoop.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  Add VM Argument -DCATALOG_TYPE=hive to activate this profile  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+---
+spring.config.activate.on-profile: hive-catalog
+#---------------- Hive Iceberg Catalog configurations ----------------
+spark:
+  sql:
+    catalog:
+      hive: org.apache.iceberg.spark.SparkCatalog
+      hive.type: hive
+      hive.warehouse: ${CATALOG_WAREHOUSE:/user/hive/warehouse}
+      #      hive.warehouse: ${CATALOG_WAREHOUSE:s3a://my-iceberg-bucket}
+      hive.uri: ${CATALOG_URI:thrift://localhost:9083}
+      hive.default-namespace: ${CATALOG_NAMESPACE:ksoot}
+      hive.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
+#      hive.io-impl: org.apache.iceberg.aws.s3.S3FileIO
+#      hive.hadoop.access.key: ${AWS_ACCESS_KEY:}
+#      hive.hadoop.fs.s3a.secret.key: ${AWS_SECRET_KEY:}
+#      hive.hadoop.fs.s3a.endpoint: ${AWS_S3_ENDPOINT:s3.ap-south-1.amazonaws.com}
+#      hive.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+#      hive.hadoop.fs.s3a.path.style.access: true  # For path-style access, useful in some S3-compatible services
+#      hive.hadoop.fs.s3a.connection.ssl.enabled: false  # Enable SSL
+#      hive.hadoop.fs.s3a.fast.upload: true  # Enable faster uploads
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  Add VM Argument -DCATALOG_TYPE=nessie to activate this profile  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+---
+spring.config.activate.on-profile: nessie-catalog
+#---------------- Nessie Iceberg Catalog configurations ----------------
+spark:
+  sql:
+    catalog:
+      nessie: org.apache.iceberg.spark.SparkCatalog
+      nessie.type: nessie
+#      nessie.warehouse: ${CATALOG_WAREHOUSE:s3a://my-iceberg-bucket}
+      nessie.warehouse: ${CATALOG_WAREHOUSE:hdfs://localhost:9000/warehouse}
+      nessie.uri: ${CATALOG_URI:http://localhost:19120/api/v2}
+      nessie.default-namespace: ${CATALOG_NAMESPACE:ksoot}
+      #      nessie.ref: "main"
+      nessie.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
+#      nessie.io-impl: org.apache.iceberg.aws.s3.S3FileIO
+#      nessie.hadoop.access.key: ${AWS_ACCESS_KEY:}
+#      nessie.hadoop.fs.s3a.secret.key: ${AWS_SECRET_KEY:}
+#      nessie.hadoop.fs.s3a.endpoint: ${AWS_S3_ENDPOINT:s3.ap-south-1.amazonaws.com}
+#      nessie.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+#      nessie.hadoop.fs.s3a.path.style.access: true  # For path-style access, useful in some S3-compatible services
+#      nessie.hadoop.fs.s3a.connection.ssl.enabled: false  # Enable SSL
+#      nessie.hadoop.fs.s3a.fast.upload: true  # Enable faster

@@ -1,0 +1,149 @@
+{
+	"info": {
+		"_postman_id": "606723ee-bd66-4880-a970-35a27bc69d0d",
+		"name": "Spark Iceberg",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1639624",
+		"_collection_link": "https://orange-shuttle-529992.postman.co/workspace/MLHub~d3ec7a6e-802d-457b-84e7-7f3137f55a57/collection/1639624-606723ee-bd66-4880-a970-35a27bc69d0d?action=share&source=collection_link&creator=1639624"
+	},
+	"item": [
+		{
+			"name": "Create or Update Iceberg Tables",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8090/v1/iceberg/tables",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"v1",
+						"iceberg",
+						"tables"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'PUT' \\\n  'http://localhost:8090/v1/iceberg/tables' \\\n  -H 'accept: */*'"
+			},
+			"response": []
+		},
+		{
+			"name": "Print Iceberg Table Schema",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8090/v1/iceberg/tables/print-schema",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"v1",
+						"iceberg",
+						"tables",
+						"print-schema"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'GET' \\\n  'http://localhost:8090/v1/iceberg/tables/print-schema' \\\n  -H 'accept: */*'"
+			},
+			"response": []
+		},
+		{
+			"name": "Write Data into Iceberg Tables",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8090/v1/iceberg/tables/write-data",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"v1",
+						"iceberg",
+						"tables",
+						"write-data"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'POST' \\\n  'http://localhost:8090/v1/iceberg/tables/write-data' \\\n  -H 'accept: */*' \\\n  -d ''"
+			},
+			"response": []
+		},
+		{
+			"name": "Read Data from Iceberg Tables",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8090/v1/iceberg/tables/read-data",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"v1",
+						"iceberg",
+						"tables",
+						"read-data"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'GET' \\\n  'http://localhost:8090/v1/iceberg/tables/read-data' \\\n  -H 'accept: */*'"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Iceberg Tables",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8090/v1/iceberg/tables",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"v1",
+						"iceberg",
+						"tables"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'DELETE' \\\n  'http://localhost:8090/v1/iceberg/tables' \\\n  -H 'accept: */*'"
+			},
+			"response": []
+		}
+	]
+}

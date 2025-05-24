@@ -1,21 +1,19 @@
-version: "3.9"
-
 services:
-#  dremio:
-#    image: dremio/dremio-oss:latest
-#    container_name: dremio
-#    ports:
-#      - 9047:9047
-#      - 31010:31010
-#      - 45678:45678
-#    volumes:
-#      - dremio_data:/opt/dremio/data
-#    deploy:
-#      restart_policy:
-#        condition: on-failure
-#        delay: 5s
-#        max_attempts: 3
-#        window: 120s
+  dremio:
+    image: dremio/dremio-oss:latest
+    container_name: dremio
+    ports:
+      - 9047:9047
+      - 31010:31010
+      - 45678:45678
+    volumes:
+      - dremio_data:/opt/dremio/data
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 
   nessie:
     image: ghcr.io/projectnessie/nessie:0.101.3
@@ -49,7 +47,7 @@ services:
     container_name: postgresdb
     image: postgres:latest
     environment:
-      POSTGRES_DB: sample_db
+      POSTGRES_DB: hive_metastore
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
     ports:
@@ -63,7 +61,7 @@ volumes:
   mongo_data:
   mongo_config:
   postgres_data:
-#  dremio_data:
+  dremio_data:
 
 networks:
   default:

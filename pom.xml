@@ -113,15 +113,16 @@
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>io.awspring.cloud</groupId>
-            <artifactId>spring-cloud-aws-starter-s3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>bundle</artifactId>
-            <version>${awssdk-bundle.version}</version>
-        </dependency>
+<!--        Uncomment following in case you want to use store data into AWS S3 bucket-->
+<!--        <dependency>-->
+<!--            <groupId>io.awspring.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-aws-starter-s3</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>software.amazon.awssdk</groupId>-->
+<!--            <artifactId>bundle</artifactId>-->
+<!--            <version>${awssdk-bundle.version}</version>-->
+<!--        </dependency>-->
 
         <!-- Misc dependencies -->
         <dependency>

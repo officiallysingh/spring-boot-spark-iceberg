@@ -1,0 +1,45 @@
+#spring:
+#  profiles:
+#    include: hadoop-catalog
+#    include: hive-catalog
+#    include: nessie-catalog
+logging:
+  logback:
+    rollingpolicy:
+      clean-history-on-start: true
+  file:
+    path: logs
+    name: ${logging.file.path}/application.log
+  level:
+    ROOT: INFO
+    '[org.apache.spark]': warn
+    '[org.apache.hadoop]': warn
+    '[org.sparkproject]': warn
+    '[com.mongodb.spark.sql.connector.read.partitioner.Partitioner]': warn
+debug: false
+
+# ===================================================================
+# Application specific properties
+# Add your own application properties here
+# ===================================================================
+
+#------------------------- Spark configurations -------------------------
+spark:
+  master: local[*]
+#  master: local[28]
+#  <n> executors, each using <c> threads and <m> megabytes of memory
+#  master: local-cluster[3,3,3072]
+  executor:
+    instances: 4
+    memory: 2g
+    cores: 2
+  driver:
+    memory: 4g
+    cores: 4
+  default:
+    parallelism: 32
+  sql:
+    adaptive:
+      enabled: true
+  ui:
+    enabled: true
