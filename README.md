@@ -1,4 +1,4 @@
-# Demo Spring boot application for testing Spark and Iceberg integration
+# Spring Boot Spark Demo using Iceberg Data Lakehouse
 
 
 > [!IMPORTANT]
