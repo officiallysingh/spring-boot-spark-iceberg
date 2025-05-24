@@ -1,0 +1,136 @@
+# ===================================================================
+# Spring Boot configuration.
+#
+# This configuration will be overridden by the Spring profile you use,
+# for example application-dev.yml if you use the "dev" profile.
+#
+# Full reference for Standard Spring Boot properties is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+# set -Dspring.profiles.active=<dev|sit|int> as JVM argument to run in desired profile
+# If no profile is specified explicitly, application will fall back to default profile, which is "local"
+
+spring:
+  application:
+    name: spring-boot-spark-iceberg
+#  autoconfigure:
+#    exclude: org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+  devtools:
+    add-properties: false
+    restart:
+      enabled: false
+      exclude: logs/*,application.log,*.log,*.log.*
+  main:
+    log-startup-info: true
+  messages:
+    basename: messages,i18n/problems
+    cache-duration: PT10S # 10 second, see the ISO 8601 standard
+    fallback-to-system-locale: true
+    always-use-message-format: false
+    use-code-as-default-message: false
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+    problemdetails:
+      enabled: false
+  threads:
+    virtual:
+      enabled: true
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+#  cloud:
+#    aws:
+#      credentials:
+#        access-key: ${AWS_ACCESS_KEY:}
+#        secret-key: ${AWS_SECRET_KEY:}
+#      region:
+#        static: ${AWS_REGION:ap-south-1}
+#      s3:
+#        endpoint: ${AWS_S3_ENDPOINT:https://s3.ap-south-1.amazonaws.com}
+
+#------------------------- Swagger configuration -------------------------
+springdoc:
+  show-actuator: true
+  group-configs:
+    - group: actuator
+      display-name: Actuator
+      paths-to-match: /actuator/**
+    - group: iceberg
+      display-name: Iceberg
+      paths-to-match: /**
+      paths-to-exclude: /actuator/**
+  swagger-ui:
+    syntaxHighlight:
+      activated: true
+
+# ------------------------ Problem configurations  ------------------------
+problem:
+  type-url: http://localhost:${server.port}/problems/help.html
+  enabled: true
+  debug-enabled: false
+  stacktrace-enabled: false
+  cause-chains-enabled: false
+
+server:
+  port: 8090
+  forward-headers-strategy: framework
+#  servlet:
+#      context-path:
+logging:
+  level:
+    ROOT: info
+#    '[org.mongodb.driver]': warn
+debug: false
+
+# ===================================================================
+# Application specific properties
+# Add your own application properties here
+# ===================================================================
+
+#------------------------- Spark configurations -------------------------
+spark:
+  master: local
+  app.name: ${spring.application.name}
+  local.dir: spark-space/tmp
+  driver:
+    memory: 4g
+    cores: 4
+  executor:
+    instances: 4
+    memory: 2g
+    cores: 2
+  ui:
+    enabled: false
+  default:
+    parallelism: 32
+  sql:
+    datetime.java8API.enabled: true
+    session.timeZone: "+05:30"
+    #    extensions: org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions
+    #    - org.projectnessie.spark.extensions.NessieSparkSessionExtensions
+    #    extensions: org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions
+#    defaultCatalog: local
+    #    Catalog name is local, can be set to any value
+#    catalog:
+#      local: org.apache.iceberg.spark.SparkCatalog
+#      local.type: nessie
+#      local.warehouse: s3a://my-bucket
+#      local.uri: http://localhost:19120/api/v1
+#      local.default-namespace: ksoot
+##      local.ref: "main"
+#      local.io-impl: org.apache.iceberg.aws.s3.S3FileIO
+
+#  hadoop:
+#    fs:
+#      s3a:
+#        aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
+#        access.key: ${AWS_ACCESS_KEY:}
+#        secret.key: ${AWS_SECRET_KEY:}
+#        endpoint: ${AWS_S3_ENDPOINT:s3.ap-south-1.amazonaws.com}
+#        impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+#        path.style.access: true  # For path-style access, useful in some S3-compatible services
+#        connection.ssl.enabled: false  # Enable SSL
+#        fast.upload: true  # Enable faster uploads

@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+#  dremio:
+#    image: dremio/dremio-oss:latest
+#    container_name: dremio
+#    ports:
+#      - 9047:9047
+#      - 31010:31010
+#      - 45678:45678
+#    volumes:
+#      - dremio_data:/opt/dremio/data
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        max_attempts: 3
+#        window: 120s
+
+  nessie:
+    image: ghcr.io/projectnessie/nessie:0.101.3
+    container_name: nessie
+    ports:
+      # API port
+      - "19120:19120"
+      # Management port (metrics and health checks)
+      - "9000:9000"
+    depends_on:
+      - mongo
+    environment:
+      - nessie.version.store.type=MONGODB
+      - quarkus.mongodb.database=nessie
+      - quarkus.mongodb.connection-string=mongodb://root:password@mongo:27017
+#      - quarkus.mongodb.connection-string=mongodb://localhost:27017
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - "mongo_data:/data/db"
+      - "mongo_config:/data/configdb"
+
+  postgres:
+    container_name: postgresdb
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: sample_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+#    networks:
+#      - ksoot
+
+volumes:
+  mongo_data:
+  mongo_config:
+  postgres_data:
+#  dremio_data:
+
+networks:
+  default:
+    name: ksoot
+    driver: bridge
