@@ -34,7 +34,8 @@ By addressing the limitations of older table formats like Apache Hive—such as 
 * Go to `Modify options`, click on `Add VM options` and set the value as `--add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED`  
   to avoid exception `Factory method 'sparkSession' threw exception with message: class org.apache.spark.storage.StorageUtils$ (in unnamed module @0x2049a9c1) cannot access class sun.nio.ch.DirectBuffer (in module java.base) because module java.base does not export sun.nio.ch to unnamed module @0x2049a9c1`  
   and to Run this Spring boot application in active profile `local`.
-* Go to `Modify options` and set active profile as either `local` or `docker` by setting either `-Dspring.profiles.active=local` or  `-Dspring.profiles.active=docker`.
+* Go to `Modify options` and set active profile as either `local` or `docker` by setting either `-Dspring.profiles.active=local` or  `-Dspring.profiles.active=docker` respectively.
+* Go to `Modify options` and set Catalog type as either `hadoop`, `hive` or `nessie` by setting either `-DCATALOG_TYPE=hadoop` or `-DCATALOG_TYPE=hive` or `-DCATALOG_TYPE=nessie` respectively.
 * Go to `Modify options` and make sure `Add dependencies with "provided" scope to classpath` is checked.
 * [Configure Formatter in intelliJ](https://github.com/google/google-java-format/blob/master/README.md#intellij-android-studio-and-other-jetbrains-ides), refer to [fmt-maven-plugin](https://github.com/spotify/fmt-maven-plugin) for details.
 * Make sure environment variable `SPARK_HOME` is set to local spark installation, find at [spark-3.5.5-bin-hadoop3](https://dlcdn.apache.org/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3.tgz).
