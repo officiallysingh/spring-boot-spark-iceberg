@@ -1,8 +1,4 @@
 #spring:
-#  profiles:
-#    include: hadoop-catalog
-#    include: hive-catalog
-#    include: nessie-catalog
 logging:
   logback:
     rollingpolicy:

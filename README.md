@@ -1,32 +1,37 @@
-# Spring Boot Spark Demo using Iceberg Data Lakehouse
+# Spring Boot Spark integration with Apache Iceberg Data Lakehouse
+Apache Iceberg is a high-performance table format for huge analytic datasets, enabling ACID operations (create, update, delete) and supporting time travel, schema evolution, and efficient data ingestion.  
+Integrating Iceberg with Spark and Spring Boot allows you to build robust data lake applications with modern engineering practices.
+
+**Key Features of [Apache Iceberg](https://iceberg.apache.org)**:
+- ACID transactions on data lakes
+- Versioned table snapshots for time travel and rollback
+- Schema evolution without rewriting data
+- Support for multiple catalog types: Hadoop, Hive, and Nessie
 
 ## Requirements
-This application requires:
+This project requires:
 
 - [Java 17](https://sdkman.io/install/)
 - [Scala 2.13.16](https://sdkman.io/install/)
-- [spark-3.5.5-bin-hadoop3](https://www.apache.org/dyn/closer.lua/spark/spark-3.5.5/spark-3.5.5-bin-hadoop3.tgz)
+- [Spark 3.5.5](https://www.apache.org/dyn/closer.lua/spark/spark-3.5.5/spark-3.5.5-bin-hadoop3.tgz)
 - [Apache Hadoop](https://hadoop.apache.org/releases.html)
 - [Apache Hive 4.0.1](https://dlcdn.apache.org/hive/hive-4.0.1/apache-hive-4.0.1-bin.tar.gz)
 - `maven`
 - `docker`
 
-Recommended [sdkman](https://sdkman.io/install/) for managing Java, Scala and even Spark installations.
+Recommended [sdkman](https://sdkman.io/install/) for managing Java, Scala and even Spark installations and [IntelliJ IDEA](https://www.jetbrains.com/idea/) for development.
 
 **Refer to** [**Apache Hadoop and Hive installation guide**](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90) **for details on how to install Hadoop and Hive**.
 
-## Apache Iceberg
-Apache Iceberg is an open-source, high-performance table format designed for managing large-scale analytic datasets in data lakes and lakehouses.  
-It brings the reliability and features of traditional SQL tables—like ACID transactions, schema evolution, and time travel—to modern big data environments.  
-Iceberg enables multiple compute engines (such as Spark, Trino, Flink, and others) to operate on the same data in a transactionally consistent way, making it engine-agnostic and highly flexible.
-Key features include:
-- **ACID Transactions**: Ensures reliable and consistent data operations, even with concurrent reads and writes.
-- **Schema and Partition Evolution**: Allows you to add, drop, or rename columns and change partition strategies without rewriting entire tables, supporting fast-changing data environments.
-- **Time Travel and Rollbacks**: Maintains a full history of changes, enabling you to query or restore previous versions of your data.
-- **Hidden Partitioning and Pruning**: Optimizes query performance by automatically managing partition logic and skipping irrelevant data.
-- **Open and Flexible**: Supports multiple file formats (Parquet, ORC, Avro) and integrates with various catalogs (Hadoop, Hive, Nessie), making it suitable for diverse data architectures.
-- **Rich Metadata and Governance**: Provides snapshot-based auditing, lineage tracking, and foundational support for data governance.
-By addressing the limitations of older table formats like Apache Hive—such as lack of ACID guarantees, slow queries, and rigid schemas—Iceberg has become a leading choice for organizations building modern, scalable data lakehouses.
+## Features
+- Spring Boot: API/Task runner layer
+- Spark: Data processing engine
+- Iceberg: Table format
+- Catalogs: Table management
+- Storage: HDFS/S3/Local FS
+
+## Spark Configurations
+
 
 ## IntelliJ Run Configurations
 * Got to main class [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) and Modify run

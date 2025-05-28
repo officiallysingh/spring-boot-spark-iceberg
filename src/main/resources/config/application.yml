@@ -14,7 +14,9 @@ spring:
   application:
     name: spring-boot-spark-iceberg
   profiles:
-    include: ${CATALOG_TYPE:none}-catalog
+    include:
+      - ${CATALOG_TYPE:none}-catalog
+      - ${STORAGE_TYPE:hadoop}-storage
   docker:
     compose:
       enabled: false
@@ -45,16 +47,6 @@ spring:
   jackson:
     serialization:
       write-dates-as-timestamps: false
-
-#  cloud:
-#    aws:
-#      credentials:
-#        access-key: ${AWS_ACCESS_KEY:}
-#        secret-key: ${AWS_SECRET_KEY:}
-#      region:
-#        static: ${AWS_REGION:ap-south-1}
-#      s3:
-#        endpoint: ${AWS_S3_ENDPOINT:https://s3.ap-south-1.amazonaws.com}
 
 #------------------------- Swagger configuration -------------------------
 springdoc:
@@ -106,23 +98,11 @@ spark:
   sql:
     datetime.java8API.enabled: true
     session.timeZone: "+05:30"
-#  hadoop:
-#    fs:
-#      s3a:
-#        aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
-#        access.key: ${AWS_ACCESS_KEY:}
-#        secret.key: ${AWS_SECRET_KEY:}
-#        endpoint: ${AWS_S3_ENDPOINT:s3.ap-south-1.amazonaws.com}
-#        impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-#        path.style.access: true  # For path-style access, useful in some S3-compatible services
-#        connection.ssl.enabled: false  # Enable SSL
-#        fast.upload: true  # Enable faster uploads
-
 
 #----------------- Iceberg Catalog configurations ----------------
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#  Add VM Argument -DCATALOG_TYPE=hadoop to activate this profile  #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  Add VM Argument -DCATALOG_TYPE=hadoop to activate this profile   #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ---
 spring.config.activate.on-profile: hadoop-catalog
 #----------------- Hadoop Iceberg Catalog configurations ----------------
@@ -131,13 +111,11 @@ spark:
     catalog:
       hadoop: org.apache.iceberg.spark.SparkCatalog
       hadoop.type: hadoop
-      hadoop.warehouse: ${CATALOG_WAREHOUSE:hdfs://localhost:9000/warehouse}
       hadoop.uri: ${CATALOG_URI:hdfs://localhost:9000}
       hadoop.default-namespace: ${CATALOG_NAMESPACE:ksoot}
-      hadoop.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#  Add VM Argument -DCATALOG_TYPE=hive to activate this profile  #
+#  Add VM Argument -DCATALOG_TYPE=hive to activate this profile   #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ---
 spring.config.activate.on-profile: hive-catalog
@@ -147,23 +125,12 @@ spark:
     catalog:
       hive: org.apache.iceberg.spark.SparkCatalog
       hive.type: hive
-      hive.warehouse: ${CATALOG_WAREHOUSE:/user/hive/warehouse}
-      #      hive.warehouse: ${CATALOG_WAREHOUSE:s3a://my-iceberg-bucket}
       hive.uri: ${CATALOG_URI:thrift://localhost:9083}
       hive.default-namespace: ${CATALOG_NAMESPACE:ksoot}
-      hive.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
-#      hive.io-impl: org.apache.iceberg.aws.s3.S3FileIO
-#      hive.hadoop.access.key: ${AWS_ACCESS_KEY:}
-#      hive.hadoop.fs.s3a.secret.key: ${AWS_SECRET_KEY:}
-#      hive.hadoop.fs.s3a.endpoint: ${AWS_S3_ENDPOINT:s3.ap-south-1.amazonaws.com}
-#      hive.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-#      hive.hadoop.fs.s3a.path.style.access: true  # For path-style access, useful in some S3-compatible services
-#      hive.hadoop.fs.s3a.connection.ssl.enabled: false  # Enable SSL
-#      hive.hadoop.fs.s3a.fast.upload: true  # Enable faster uploads
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#  Add VM Argument -DCATALOG_TYPE=nessie to activate this profile  #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  Add VM Argument -DCATALOG_TYPE=nessie to activate this profile   #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ---
 spring.config.activate.on-profile: nessie-catalog
 #---------------- Nessie Iceberg Catalog configurations ----------------
@@ -172,17 +139,88 @@ spark:
     catalog:
       nessie: org.apache.iceberg.spark.SparkCatalog
       nessie.type: nessie
-#      nessie.warehouse: ${CATALOG_WAREHOUSE:s3a://my-iceberg-bucket}
-      nessie.warehouse: ${CATALOG_WAREHOUSE:hdfs://localhost:9000/warehouse}
       nessie.uri: ${CATALOG_URI:http://localhost:19120/api/v2}
       nessie.default-namespace: ${CATALOG_NAMESPACE:ksoot}
       #      nessie.ref: "main"
+
+#----------------- Blob storage configurations ----------------
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  Add VM Argument -DSTORAGE_TYPE=hadoop to activate this profile   #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+---
+spring.config.activate.on-profile: hadoop-storage
+#----------------- Hadoop configurations ----------------
+spark:
+  sql:
+    catalog:
+      hadoop.warehouse: ${CATALOG_WAREHOUSE:hdfs://localhost:9000/warehouse}
+      hadoop.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
+      hive.warehouse: ${CATALOG_WAREHOUSE:/user/hive/warehouse}
+      hive.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
+      nessie.warehouse: ${CATALOG_WAREHOUSE:hdfs://localhost:9000/warehouse}
       nessie.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
-#      nessie.io-impl: org.apache.iceberg.aws.s3.S3FileIO
-#      nessie.hadoop.access.key: ${AWS_ACCESS_KEY:}
-#      nessie.hadoop.fs.s3a.secret.key: ${AWS_SECRET_KEY:}
-#      nessie.hadoop.fs.s3a.endpoint: ${AWS_S3_ENDPOINT:s3.ap-south-1.amazonaws.com}
-#      nessie.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-#      nessie.hadoop.fs.s3a.path.style.access: true  # For path-style access, useful in some S3-compatible services
-#      nessie.hadoop.fs.s3a.connection.ssl.enabled: false  # Enable SSL
-#      nessie.hadoop.fs.s3a.fast.upload: true  # Enable faster
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  Add VM Argument -DSTORAGE_TYPE=aws-s3 to activate this profile   #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+---
+spring.config.activate.on-profile: aws-s3-storage
+#----------------- AWS S3 configurations ----------------
+spring:
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      region:
+        static: ${AWS_REGION:ap-south-1}
+      s3:
+        endpoint: ${AWS_S3_ENDPOINT:https://s3.ap-south-1.amazonaws.com}
+
+spark:
+  hadoop:
+    fs:
+      s3a:
+        aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
+        access.key: ${AWS_ACCESS_KEY}
+        secret.key: ${AWS_SECRET_KEY}
+        endpoint: ${AWS_S3_ENDPOINT:s3.ap-south-1.amazonaws.com}
+        impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+        path.style.access: true  # For path-style access, useful in some S3-compatible services
+        connection.ssl.enabled: false  # Enable SSL
+        fast.upload: true  # Enable faster uploads
+
+  sql:
+    catalog:
+      hadoop.warehouse: ${CATALOG_WAREHOUSE:s3a://ksoot-iceberg/warehouse}
+      hadoop.io-impl: org.apache.iceberg.aws.s3.S3FileIO
+      hive.warehouse: ${CATALOG_WAREHOUSE:s3a://ksoot-iceberg/warehouse}
+      hive.io-impl: org.apache.iceberg.aws.s3.S3FileIO
+      nessie.warehouse: ${CATALOG_WAREHOUSE:s3a://ksoot-iceberg/warehouse}
+      nessie.io-impl: org.apache.iceberg.aws.s3.S3FileIO
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  Add VM Argument -DSTORAGE_TYPE=gcs to activate this profile   #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+---
+spring.config.activate.on-profile: gcs-storage
+#----------------- Google Cloud Storage configurations ----------------
+#spark:
+#  hadoop:
+#    google.cloud.auth.service.account.json.keyfile: <your sa-key.json>
+#  sql:
+#    catalog:
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  Add VM Argument -DSTORAGE_TYPE=abs to activate this profile   #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+---
+spring.config.activate.on-profile: abs-storage
+#----------------- Azure Blob Storage configurations ----------------
+#spark:
+#  hadoop:
+#
+#  sql:
+#    catalog:
+
