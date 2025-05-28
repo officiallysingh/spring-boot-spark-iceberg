@@ -199,9 +199,9 @@ spark:
       nessie.warehouse: ${CATALOG_WAREHOUSE:s3a://ksoot-iceberg/warehouse}
       nessie.io-impl: org.apache.iceberg.aws.s3.S3FileIO
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#  Add VM Argument -DSTORAGE_TYPE=gcs to activate this profile   #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  Add VM Argument -DSTORAGE_TYPE=gcs to activate this profile    #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ---
 spring.config.activate.on-profile: gcs-storage
 #----------------- Google Cloud Storage configurations ----------------
@@ -212,9 +212,9 @@ spring.config.activate.on-profile: gcs-storage
 #    catalog:
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#  Add VM Argument -DSTORAGE_TYPE=abs to activate this profile   #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  Add VM Argument -DSTORAGE_TYPE=abs to activate this profile    #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ---
 spring.config.activate.on-profile: abs-storage
 #----------------- Azure Blob Storage configurations ----------------
@@ -223,4 +223,3 @@ spring.config.activate.on-profile: abs-storage
 #
 #  sql:
 #    catalog:
-
