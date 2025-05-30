@@ -31,7 +31,7 @@ This project requires:
 - **Storage**: Local FS/HDFS/AWS S3/GCS/Azure Blob Storage.
 
 > [!IMPORTANT]  
-> **Refer to** [**Spark Spring Boot starter**](https://medium.com/@officiallysingh/spark-spring-boot-starter-e206def765b9) **for details on how Spark and Iceberg beans are auto-configured using `application.yml` configurations**.  
+> **Refer to** [**Spark Spring Boot starter**](https://github.com/officiallysingh/spring-boot-starter-spark) **for details on how Spark and Iceberg beans are auto-configured using `application.yml` configurations**.  
 > **Refer to** [**Apache Hadoop and Hive installation guide**](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90) **for details on how to install Hadoop and Hive**.
 
 ## Iceberg
