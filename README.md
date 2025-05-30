@@ -256,9 +256,9 @@ spark:
 
 > [!IMPORTANT]
 > You can also configure multiple catalogs in your Spark application, for example, you can have both Hadoop and Hive catalogs configured in your application,
-> but choose the one you want to use in your Spark pipelines at runtime.  
+> but choose the one you want to use in your Spark pipelines at runtime. 
 > You can see we need to set AWS S3 and Hadoop S3A configurations at multiple places because of following reasons
-> - Spring boot application is not picking up the region from application.yml configurations, so need to set it through AWS Cli settings.
+> - Spring boot application is not picking up the region from `application.yml` configurations, so need to set it through AWS Cli settings.
 > - Apache Hive accesses AWS S3 through Hadoop S3A configurations, so need to set them in `hive-site.xml`.
 > - AWS_ACCESS_KEY, AWS_SECRET_KEY and AWS_S3_ENDPOINT need to be set in `application.yml` to make them available to Spark at runtime.
 
