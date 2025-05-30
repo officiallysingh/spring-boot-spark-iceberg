@@ -333,19 +333,16 @@ To stop the services and delete volumes, execute:
 * Got to main class [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) and Modify run configurations as follows, depending on the Catalog type as follows.
 
 #### Hadoop Catalog
-* Make sure Hadoop is running.
 * Set Catalog type as `hadoop` by setting VM option `-DCATALOG_TYPE=hadoop`
 * Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
 #### Hive Catalog
-* Make sure Hadoop is running.
 * Make sure Hive Server and Hive Metastore are running as per [Hadoop & Hive Installation Guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90).
 * Make sure Postgres is running with same username and password as specified in `$HIVE_HOME/conf/hive-site.xml`.
 * Set Catalog type as `hive` by setting VM option `-DCATALOG_TYPE=hive`
 * Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
 #### Nessie Catalog
-* Make sure Hadoop is running.
 * Make sure MongoDB and Nessie are running. Confirm that Mongo connection-string is set correctly in environment variable `quarkus.mongodb.connection-string` in [compose.yml](compose.yml)'s service `nessie`. Recommended to run Mongo and Nessie using docker-compose.
 * You can access Nessie UI at `http://localhost:19120/api/v2/ui` to view the Iceberg tables.
 * Set Catalog type as `nessie` by setting VM option `-DCATALOG_TYPE=nessie`
