@@ -369,7 +369,7 @@ and Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/Spar
 * Set Catalog type as `nessie` by setting VM option `-DCATALOG_TYPE=nessie`
 
 ## Testing
-Once the application is running, you can access [Swagger UI](http://localhost:8090/swagger-ui/index.html) or use [Postman Collection](Spark%20Iceberg.postman_collection.json).
+Once the application is running, you can access [Swagger UI](http://localhost:8090/swagger-ui/index.html) or use [Postman Collection](Spark%20Iceberg.postman_collection.json) to make API calls.
 
 ![Swagger UI](https://github.com/officiallysingh/spring-boot-spark-iceberg/blob/main/img/Swagger.png)
 
