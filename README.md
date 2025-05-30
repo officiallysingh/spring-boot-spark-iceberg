@@ -36,9 +36,9 @@ This project requires:
 
 ## Iceberg
 Iceberg can be configured to use different catalog types and storage backends. **This demo has been tested to use following three catalog types**:
-* [**`HadoopCatalog`**](https://iceberg.apache.org/docs/1.9.0/java-api-quickstart/#using-a-hadoop-catalog).
-* [**`HiveCatalog`**](https://iceberg.apache.org/docs/1.9.0/java-api-quickstart/#using-a-hive-catalog).
-* [**`NessieCatalog`**](https://iceberg.apache.org/docs/1.9.0/nessie/).
+* [**`HadoopCatalog`**](https://iceberg.apache.org/docs/1.9.0/java-api-quickstart/#using-a-hadoop-catalog)
+* [**`HiveCatalog`**](https://iceberg.apache.org/docs/1.9.0/java-api-quickstart/#using-a-hive-catalog)
+* [**`NessieCatalog`**](https://iceberg.apache.org/docs/1.9.0/nessie/)
 
 **And following two storage backends**:
 * Local Hadoop.
