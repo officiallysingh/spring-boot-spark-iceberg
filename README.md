@@ -143,7 +143,7 @@ spark:
         connection.ssl.enabled: false  # Enable SSL
         fast.upload: true  # Enable faster uploads
 ```
-**Or you can configure them in each catalog configuration as shown in the following sections, if it's different from the global configurations.  
+**Or you can configure them in each catalog configuration as shown in the following sections, if it's different from the global configurations. 
 It will override the global configurations (if specified) for that particular catalog.**
 
 > [!NOTE]
