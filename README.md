@@ -263,7 +263,7 @@ spark:
 > - AWS_ACCESS_KEY, AWS_SECRET_KEY and AWS_S3_ENDPOINT need to be set in `application.yml` to make them available to Spark at runtime.
 
 ## Table Operations
-For details on how to create, update and delete Iceberg [tables]((https://iceberg.apache.org/javadoc/1.9.0/org/apache/iceberg/Table.html)) in Iceberg Catalog, refer to the [**IcebergCatalogClient**](src/main/java/com/ksoot/spark/iceberg/service/IcebergCatalogClient.java) class.  
+For details on how to create, update and delete Iceberg [tables](https://iceberg.apache.org/javadoc/1.9.0/org/apache/iceberg/Table.html) in Iceberg Catalog, refer to the [**IcebergCatalogClient**](src/main/java/com/ksoot/spark/iceberg/service/IcebergCatalogClient.java) class.  
 `IcebergCatalogClient` provides the following methods:
 - `tableExists`: Checks if a table exists or not.
 - `loadTable`: Get an instance of an Iceberg table.
