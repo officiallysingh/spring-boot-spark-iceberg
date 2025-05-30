@@ -190,7 +190,7 @@ spark:
 spark:
   sql:
     catalog:
-      hadoop.warehouse: ${CATALOG_WAREHOUSE:s3a://<Your S3 Bucket Name>/warehouse}
+      hadoop.warehouse: ${CATALOG_WAREHOUSE:s3a://${CATALOG_AWS_BUCKET:<Your S3 Bucket Name>}/warehouse}
       hadoop.io-impl: org.apache.iceberg.aws.s3.S3FileIO
 ```
 
@@ -220,7 +220,7 @@ spark:
 spark:
   sql:
     catalog:
-      hive.warehouse: ${CATALOG_WAREHOUSE:s3a://<Your S3 Bucket Name>/warehouse}
+      hive.warehouse: ${CATALOG_WAREHOUSE:s3a://${CATALOG_AWS_BUCKET:<Your S3 Bucket Name>}/warehouse}
       hive.io-impl: org.apache.iceberg.aws.s3.S3FileIO
 ```
 
@@ -250,7 +250,7 @@ spark:
 spark:
   sql:
     catalog:
-      nessie.warehouse: ${CATALOG_WAREHOUSE:s3a://<Your S3 Bucket Name>/warehouse}
+      nessie.warehouse: ${CATALOG_WAREHOUSE:s3a://${CATALOG_AWS_BUCKET:<Your S3 Bucket Name>}/warehouse}
       nessie.io-impl: org.apache.iceberg.aws.s3.S3FileIO
 ```
 
