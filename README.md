@@ -274,7 +274,7 @@ It provides the following methods:
 - `renameTable`: Renames an Iceberg table.
 
 ## Data Operations
-Refer to [SparkIcebergService](src/main/java/com/ksoot/spark/iceberg/service/SparkIcebergService.java) for details on how to write and read data into Iceberg tables.
+Refer to [SparkIcebergService](src/main/java/com/ksoot/spark/iceberg/service/SparkIcebergService.java) class for details on how to write and read data into Iceberg tables.
 
 ### Write Data
 Following are different variants to write data into Iceberg tables:
