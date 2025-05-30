@@ -51,7 +51,7 @@ For details refer to [**`application.yml`**](src/main/resources/config/applicati
 * **STORAGE_TYPE**: Type of storage to use, can either be `hadoop` (default) or `aws-s3`. e.g. `-DSTORAGE_TYPE=hadoop` or `-DSTORAGE_TYPE=aws-s3`.
 
 > [!IMPORTANT]
-> [Other Catalog types](https://iceberg.apache.org/docs/latest/spark-configuration/#catalog-configuration), Azure Blob Storage and Google Cloud Storage (GCS) are also supported as data storage for Iceberg tables.  
+> [Other Catalog types](https://iceberg.apache.org/docs/latest/spark-configuration/#catalog-configuration), Azure Blob Storage and Google Cloud Storage (GCS) are also supported as data storage for Iceberg tables. 
 > You need to have required dependencies in your classpath and configure catalog properties accordingly in `application.yml` or `application.properties` file.
 
 ### Setting up AWS S3 for Data storage
