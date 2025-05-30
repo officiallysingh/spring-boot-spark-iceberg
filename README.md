@@ -147,7 +147,7 @@ spark:
 It will override the global configurations (if specified) for that particular catalog.**
 
 > [!NOTE]
-> Replace catalog_name with the catalog name of your choice, for example, `hadoop`, `hive` or `nessie`.
+> Replace `catalog_name` with the catalog name of your choice, for example, `hadoop`, `hive` or `nessie`.
 
 ```yaml
 spark:
