@@ -312,7 +312,7 @@ Following two VM options are always required.
 ### Docker compose
 The Docker [compose.yml](compose.yml) file defines following services.
 * **postgres**: Required for `hive` catalog to use Postgres as its internal database. Comment out if Postgres is installed locally.
-* **mongo**: Required for `nessie` catalog to use MongoDB as its internal database. Comment out if MongoDB is installed locally.
+* **mongo**: Required for `nessie` catalog to use MongoDB as its internal database. If MongoDB is installed locally, stop the service otherwise it will conflict with the one used by Nessie via docker compose.
 * **nessie**: Required for `nessie` catalog.
 * **dremio**: Optional, it can be used to browse and query the Iceberg tables.
 
