@@ -1,16 +1,21 @@
 package com.ksoot.spark.iceberg.service;
 
+import static com.ksoot.spark.iceberg.util.Constants.PROVIDER_ICEBERG;
+
 import com.ksoot.spark.springframework.boot.autoconfigure.CatalogProperties;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.catalyst.analysis.NoSuchTableException;
 import org.springframework.util.Assert;
 
 @RequiredArgsConstructor
-public class SparkIcebergIngestor {
+public class SparkIcebergService {
 
   private final CatalogProperties catalogProperties;
+
+  private final SparkSession sparkSession;
 
   /**
    * Append the contents of the data frame to the output table.
@@ -24,10 +29,7 @@ public class SparkIcebergIngestor {
   public void appendData(final Dataset<Row> dataset, final String tableName)
       throws NoSuchTableException {
     Assert.hasText(tableName, "'tableName' is required");
-    final String icebergTable =
-        tableName.startsWith(this.catalogProperties.tablePrefix())
-            ? tableName
-            : this.catalogProperties.tablePrefix() + tableName;
+    final String icebergTable = this.icebergTableName(tableName);
     dataset.writeTo(icebergTable).append();
   }
 
@@ -43,10 +45,7 @@ public class SparkIcebergIngestor {
   @Deprecated
   public void replaceData(final Dataset<Row> dataset, final String tableName) {
     Assert.hasText(tableName, "'tableName' is required");
-    final String icebergTable =
-        tableName.startsWith(this.catalogProperties.tablePrefix())
-            ? tableName
-            : this.catalogProperties.tablePrefix() + tableName;
+    final String icebergTable = this.icebergTableName(tableName);
     dataset.writeTo(icebergTable).replace();
   }
 
@@ -62,10 +61,7 @@ public class SparkIcebergIngestor {
   @Deprecated
   public void createData(final Dataset<Row> dataset, final String tableName) {
     Assert.hasText(tableName, "'tableName' is required");
-    final String icebergTable =
-        tableName.startsWith(this.catalogProperties.tablePrefix())
-            ? tableName
-            : this.catalogProperties.tablePrefix() + tableName;
+    final String icebergTable = this.icebergTableName(tableName);
     dataset.writeTo(icebergTable).create();
   }
 
@@ -79,10 +75,22 @@ public class SparkIcebergIngestor {
   @Deprecated
   public void createOrReplaceData(final Dataset<Row> dataset, final String tableName) {
     Assert.hasText(tableName, "'tableName' is required");
+    final String icebergTable = this.icebergTableName(tableName);
+    dataset.writeTo(icebergTable).createOrReplace();
+  }
+
+  public Dataset<Row> read(final String tableName) {
+    Dataset<Row> dataset =
+        this.sparkSession.read().format(PROVIDER_ICEBERG).table(this.icebergTableName(tableName));
+    //    SparkUtils.logDataset(tableName, dataset);
+    return dataset;
+  }
+
+  private String icebergTableName(final String tableName) {
     final String icebergTable =
         tableName.startsWith(this.catalogProperties.tablePrefix())
             ? tableName
             : this.catalogProperties.tablePrefix() + tableName;
-    dataset.writeTo(icebergTable).createOrReplace();
+    return icebergTable;
   }
 }

@@ -28,7 +28,7 @@ Recommended [sdkman](https://sdkman.io/install/) for managing Java, Scala and ev
 - **Spark**: Data processing engine, handles distributed data processing.
 - **Iceberg**: Manages the table format and metadata.
 - **Catalogs**: Table management.
-- **Storage**: HDFS/Local FS/AWS S3/GCS/Azure Blob Storage.
+- **Storage**: Local FS/HDFS/AWS S3/GCS/Azure Blob Storage.
 
 > [!IMPORTANT]  
 > **Refer to** [**Spark Spring Boot starter**](https://medium.com/@officiallysingh/spark-spring-boot-starter-e206def765b9) **for details on how Spark and Iceberg beans are auto-configured using `application.yml` configurations**.  
@@ -49,7 +49,7 @@ Iceberg can be configured to use different catalog types and storage backends.
 Following properties can be passed as VM options while running the application to choose Catalog type and Storage type.  
 For details refer to [**`application.yml`**](src/main/resources/config/application.yml) file.
 * `**CATALOG_TYPE**`: Type of catalog to use, can be `hadoop`, `hive` or `nessie`. e.g. `-DCATALOG_TYPE=hadoop`.
-* `**STORAGE_TYPE**`: Type of storage to use, can be `hadoop` or `aws-s3`. e.g. `-DSTORAGE_TYPE=hadoop`.
+* `**STORAGE_TYPE**`: Type of storage to use, can be `hadoop` or `aws-s3`. e.g. `-DSTORAGE_TYPE=hadoop` or `-DSTORAGE_TYPE=aws-s3`.
 
 > [!IMPORTANT]
 > [Other Catalog types](https://iceberg.apache.org/docs/latest/spark-configuration/#catalog-configuration), Azure Blob Storage and Google Cloud Storage (GCS) are also supported as data storage for Iceberg tables.  
@@ -129,8 +129,8 @@ spring:
 ```
 - Add `aws-java-sdk-bundle-1.12.262.jar`, `hadoop-aws-3.3.4.jar` and `postgresql-42.7.4.jar` to folder `$HIVE_HOME/lib`. Versions may vary, so make sure to use compatible versions with your setup.
 - **Spark Hadoop Configurations**
-  Each catalog stores its metadata in its own storage such as Postgres (or any other relational database) for Hive, MongoDB for Nessie etc.
-  But the table's data is stored in a distributed file system such as HDFS, S3, Azure Blob Storage or Google Cloud Storage (GCS).  
+  Each catalog stores some metadata regarding the tables in its own storage such as Postgres (or any other relational database) for Hive, MongoDB for Nessie etc.
+  But the catalog metadata json files and table's data is stored in a distributed file system such as HDFS, S3, Azure Blob Storage or Google Cloud Storage (GCS).  
   **So you need to set Spark Hadoop configurations, either you can configure them globally as follows, which will be used by all Catalogs configured in your application.**
 ```yaml
 spark:
@@ -146,12 +146,27 @@ spark:
         connection.ssl.enabled: false  # Enable SSL
         fast.upload: true  # Enable faster uploads
 ```
+**Or you can configure them in each catalog configuration as shown in the following sections, if it's different from the global configurations.  
+It will override the global configurations (if specified) for that particular catalog.**
 
-### Iceberg Catalog Configuration with Local Hadoop as Data storage
-**For Spark Iceberg integration demo refer to** [**`spring-boot-spark-iceberg`**](https://github.com/officiallysingh/spring-boot-spark-iceberg).
+> [!NOTE]
+> Replace catalog_name with the catalog name of your choice, for example, `hadoop`, `hive` or `nessie`.
 
-Following are Iceberg Catalog configurations using Local Hadoop as Data storage.
-#### Hadoop Catalog
+```yaml
+spark:
+  sql:
+    catalog:
+      catalog_name.io-impl: org.apache.iceberg.aws.s3.S3FileIO
+      catalog_name.hadoop.fs.s3a.access.key: ${AWS_ACCESS_KEY:<Your AWS Access Key>}
+      catalog_name.hadoop.fs.s3a.secret.key: ${AWS_SECRET_KEY:<Your AWS Secret Key>}
+      catalog_name.hadoop.fs.s3a.endpoint: ${AWS_S3_ENDPOINT:s3.<Your AWS Region>.amazonaws.com}
+      catalog_name.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
+      catalog_name.hadoop.fs.s3a.path.style.access: true  # For path-style access, useful in some S3-compatible services
+      catalog_name.hadoop.fs.s3a.connection.ssl.enabled: false  # Enable SSL
+      catalog_name.hadoop.fs.s3a.fast.upload: true  # Enable faster uploads
+```
+
+### Hadoop Catalog
 Configure Hadoop Catalog as follows. Catalog name is also set to `hadoop` but it can be any name you want.
 ```yaml
 spark:
@@ -159,154 +174,30 @@ spark:
     catalog:
       hadoop: org.apache.iceberg.spark.SparkCatalog
       hadoop.type: hadoop
-      hadoop.warehouse: ${CATALOG_WAREHOUSE:hdfs://localhost:9000/warehouse}
       hadoop.uri: ${CATALOG_URI:hdfs://localhost:9000}
       hadoop.default-namespace: ${CATALOG_NAMESPACE:ksoot}
       hadoop.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
 ```
 
-#### Hive Catalog
-Configure Hive Catalog as follows. Catalog name is also set to `hive` but it can be any name you want.
+For Storage type Local Hadoop
 ```yaml
 spark:
   sql:
     catalog:
-      hadoop: org.apache.iceberg.spark.SparkCatalog
-      hadoop.type: hadoop
       hadoop.warehouse: ${CATALOG_WAREHOUSE:hdfs://localhost:9000/warehouse}
-      hadoop.uri: ${CATALOG_URI:hdfs://localhost:9000}
-      hadoop.default-namespace: ${CATALOG_NAMESPACE:ksoot}
       hadoop.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
 ```
 
-#### Nessie Catalog
-Configure Nessie Catalog as follows. Catalog name is also set to `nessie` but it can be any name you want.
+For Storage type AWS S3
 ```yaml
 spark:
   sql:
     catalog:
-      nessie: org.apache.iceberg.spark.SparkCatalog
-      nessie.type: nessie
-      nessie.warehouse: ${CATALOG_WAREHOUSE:hdfs://localhost:9000/warehouse}
-      nessie.uri: ${CATALOG_URI:http://localhost:19120/api/v2}
-      nessie.default-namespace: ${CATALOG_NAMESPACE:ksoot}
-      nessie.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
-```
-
-### Iceberg Catalog Configuration with AWS S3 as Data storage
-Along with the catalog configurations, you also need to do following.
-- Configure [AWS Cli](https://aws.amazon.com/cli/) with your AWS credentials and region.
-- Add following dependencies to your `pom.xml`:
-```xml
-<properties>
-    <spring-cloud-aws.version>3.2.1</spring-cloud-aws.version>
-    <awssdk-bundle.version>2.25.70</awssdk-bundle.version>
-</properties>
-
-<dependencyManagement>
-    <dependencies>
-        <dependency>
-            <groupId>io.awspring.cloud</groupId>
-            <artifactId>spring-cloud-aws-dependencies</artifactId>
-            <version>${spring-cloud-aws.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-    </dependencies>
-</dependencyManagement>
-
-<dependencies>
-    <dependency>
-        <groupId>io.awspring.cloud</groupId>
-        <artifactId>spring-cloud-aws-starter-s3</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>software.amazon.awssdk</groupId>
-        <artifactId>bundle</artifactId>
-        <version>${awssdk-bundle.version}</version>
-    </dependency>
-</dependencies>
-```
-- Add the following properties to your `application.yml` or `application.properties` file:
-```yaml
-spring:
-  cloud:
-    aws:
-      credentials:
-        access-key: ${AWS_ACCESS_KEY:<Your AWS Access Key>}
-        secret-key: ${AWS_SECRET_KEY:<Your AWS Secret Key>}
-      region:
-        static: ${AWS_REGION:<Your AWS Region>}
-      s3:
-        endpoint: ${AWS_S3_ENDPOINT:https://s3.<Your AWS Region>.amazonaws.com}
-```
-- Update **$HIVE_HOME/conf/hive-site.xml** with following properties.
-```xml
-    <property>
-        <name>fs.s3a.access.key</name>
-        <value>Your AWS Access Key</value>
-    </property>
-    <property>
-        <name>fs.s3a.secret.key</name>
-        <value>Your AWS Secret Key</value>
-    </property>
-    <property>
-        <name>fs.s3a.endpoint</name>
-        <value>s3.{Your AWS Region}.amazonaws.com</value>
-    </property>
-    <property>
-        <name>fs.s3a.impl</name>
-        <value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
-    </property>
-```
-- Add `aws-java-sdk-bundle-1.12.262.jar`, `hadoop-aws-3.3.4.jar` and `postgresql-42.7.4.jar` to folder `$HIVE_HOME/lib`. Versions may vary, so make sure to use compatible versions with your setup.
-
-- Spark Hadoop Configurations
-Each catalog stores its metadata in its own storage such as Postgres (or any other relational database) for Hive, MongoDB for Nessie etc.
-But the table's data is stored in a distributed file system such as HDFS, S3, Azure Blob Storage or Google Cloud Storage (GCS).  
-**So you need to set Spark Hadoop configurations, either you can configure them globally as follows, which will be used by all Catalogs configured in your application.**
-
-```yaml
-spark:
-  hadoop:
-    fs:
-      s3a:
-        aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
-        access.key: ${AWS_ACCESS_KEY:<Your AWS Access Key>}
-        secret.key: ${AWS_SECRET_KEY:<Your AWS Secret Key>}
-        endpoint: ${AWS_S3_ENDPOINT:s3.<Your AWS Region>.amazonaws.com}
-        impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-        path.style.access: true  # For path-style access, useful in some S3-compatible services
-        connection.ssl.enabled: false  # Enable SSL
-        fast.upload: true  # Enable faster uploads
-```
-
-**Or you can configure them in each catalog configuration as shown in the following sections, if it's different from the global configurations.**
-
-**Following are Iceberg Catalog configurations using AWS S3 as Data storage.**
-
-#### Hadoop Catalog with AWS S3
-Configure Hadoop Catalog as follows. Catalog name is also set to `hadoop` but it can be any name you want.
-```yaml
-spark:
-  sql:
-    catalog:
-      hadoop: org.apache.iceberg.spark.SparkCatalog
-      hadoop.type: hadoop
       hadoop.warehouse: ${CATALOG_WAREHOUSE:s3a://<Your S3 Bucket Name>/warehouse}
-      hadoop.uri: ${CATALOG_URI:hdfs://localhost:9000}
-      hadoop.default-namespace: ${CATALOG_NAMESPACE:ksoot}
       hadoop.io-impl: org.apache.iceberg.aws.s3.S3FileIO
-      hadoop.hadoop.fs.s3a.access.key: ${AWS_ACCESS_KEY:<Your AWS Access Key>}
-      hadoop.hadoop.fs.s3a.secret.key: ${AWS_SECRET_KEY:<Your AWS Secret Key>}
-      hadoop.hadoop.fs.s3a.endpoint: ${AWS_S3_ENDPOINT:s3.<Your AWS Region>.amazonaws.com}
-      hadoop.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-      hadoop.hadoop.fs.s3a.path.style.access: true  # For path-style access, useful in some S3-compatible services
-      hadoop.hadoop.fs.s3a.connection.ssl.enabled: false  # Enable SSL
-      hadoop.hadoop.fs.s3a.fast.upload: true  # Enable faster uploads
 ```
 
-#### Hive Catalog with AWS S3
+### Hive Catalog
 Configure Hive Catalog as follows. Catalog name is also set to `hive` but it can be any name you want.
 ```yaml
 spark:
@@ -314,24 +205,29 @@ spark:
     catalog:
       hive: org.apache.iceberg.spark.SparkCatalog
       hive.type: hive
-      hive.warehouse: ${CATALOG_WAREHOUSE:s3a://<Your S3 Bucket Name>/warehouse}
       hive.uri: ${CATALOG_URI:thrift://localhost:9083}
       hive.default-namespace: ${CATALOG_NAMESPACE:ksoot}
-      hive.io-impl: org.apache.iceberg.aws.s3.S3FileIO
-      hive.hadoop.fs.s3a.access.key: ${AWS_ACCESS_KEY:<Your AWS Access Key>}
-      hive.hadoop.fs.s3a.secret.key: ${AWS_SECRET_KEY:<Your AWS Secret Key>}
-      hive.hadoop.fs.s3a.endpoint: ${AWS_S3_ENDPOINT:s3.<Your AWS Region>.amazonaws.com}
-      hive.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-      hive.hadoop.fs.s3a.path.style.access: true  # For path-style access, useful in some S3-compatible services
-      hive.hadoop.fs.s3a.connection.ssl.enabled: false  # Enable SSL
-      hive.hadoop.fs.s3a.fast.upload: true  # Enable faster uploads
 ```
 
-> [!IMPORTANT]
-> Add `aws-java-sdk-bundle-1.12.262.jar`, `hadoop-aws-3.3.4.jar` and `postgresql-42.7.4.jar` to folder `$HIVE_HOME/lib`.
-> Versions may vary, so make sure to use compatible versions with your setup.
+For Storage type Local Hadoop
+```yaml
+spark:
+  sql:
+    catalog:
+      hive.warehouse: ${CATALOG_WAREHOUSE:/user/hive/warehouse}
+      hive.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
+```
 
-#### Nessie Catalog with AWS S3
+For Storage type AWS S3
+```yaml
+spark:
+  sql:
+    catalog:
+      hive.warehouse: ${CATALOG_WAREHOUSE:s3a://<Your S3 Bucket Name>/warehouse}
+      hive.io-impl: org.apache.iceberg.aws.s3.S3FileIO
+```
+
+### Nessie Catalog
 Configure Nessie Catalog as follows. Catalog name is also set to `nessie` but it can be any name you want.
 ```yaml
 spark:
@@ -339,28 +235,73 @@ spark:
     catalog:
       nessie: org.apache.iceberg.spark.SparkCatalog
       nessie.type: nessie
-      nessie.warehouse: ${CATALOG_WAREHOUSE:s3a://<Your S3 Bucket Name>/warehouse}
       nessie.uri: ${CATALOG_URI:http://localhost:19120/api/v2}
       nessie.default-namespace: ${CATALOG_NAMESPACE:ksoot}
+```
+
+For Storage type Local Hadoop
+```yaml
+spark:
+  sql:
+    catalog:
+      nessie.warehouse: ${CATALOG_WAREHOUSE:hdfs://localhost:9000/warehouse}
+      nessie.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
+```
+
+For Storage type AWS S3
+```yaml
+spark:
+  sql:
+    catalog:
+      nessie.warehouse: ${CATALOG_WAREHOUSE:s3a://<Your S3 Bucket Name>/warehouse}
       nessie.io-impl: org.apache.iceberg.aws.s3.S3FileIO
-      nessie.hadoop.fs.s3a.access.key: ${AWS_ACCESS_KEY:<Your AWS Access Key>}
-      nessie.hadoop.fs.s3a.secret.key: ${AWS_SECRET_KEY:<Your AWS Secret Key>}
-      nessie.hadoop.fs.s3a.endpoint: ${AWS_S3_ENDPOINT:s3.<Your AWS Region>.amazonaws.com}
-      nessie.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-      nessie.hadoop.fs.s3a.path.style.access: true  # For path-style access, useful in some S3-compatible services
-      nessie.hadoop.fs.s3a.connection.ssl.enabled: false  # Enable SSL
-      nessie.hadoop.fs.s3a.fast.upload: true  # Enable faster uploads
 ```
 
 > [!IMPORTANT]
-> You can also configure multiple catalogs in your Spark application, for example, you can have both Hadoop and Hive catalogs configured in your application, 
+> You can also configure multiple catalogs in your Spark application, for example, you can have both Hadoop and Hive catalogs configured in your application,
 > but choose the one you want to use in your Spark pipelines at runtime.  
 > You can see we need to set AWS S3 and Hadoop S3A configurations at multiple places because of following reasons
 > - Spring boot application is not picking up the region from application.yml configurations, so need to set it through AWS Cli settings.
 > - Apache Hive accesses AWS S3 through Hadoop S3A configurations, so need to set them in `hive-site.xml`.
 > - AWS_ACCESS_KEY, AWS_SECRET_KEY and AWS_S3_ENDPOINT need to be set in `application.yml` to make them available to Spark at runtime.
 
+## Table Operations
+For details on how to create, update and delete Iceberg tables in Iceberg Catalog, refer to the [**IcebergCatalogClient**](src/main/java/com/ksoot/spark/iceberg/service/IcebergCatalogClient.java) class.  
+`IcebergCatalogClient` provides the following methods:
+- `tableExists`: Checks if a table exists or not.
+- `loadTable`: Get an instance of an Iceberg [table](https://iceberg.apache.org/javadoc/1.9.0/org/apache/iceberg/Table.html).
+- `createOrUpdateTable`: Creates an Iceberg table if it does not exist otherwise check if there is schema change as per passed column details, if yes update the table otherwise do nothing.
+- `createTable`: Creates an Iceberg table if it does not exist otherwise throws `AlreadyExistsException`.
+- `listTables`: Gets a list of all the Iceberg [tables](https://iceberg.apache.org/javadoc/1.9.0/org/apache/iceberg/Table.html) in a configured namespace.
+- `dropTable`: Deletes an Iceberg table.
+- `renameTable`: Renames an Iceberg table.
 
+## Data Operations
+Refer to [SparkIcebergService](src/main/java/com/ksoot/spark/iceberg/service/SparkIcebergService.java) for details on how to write and read data into Iceberg tables.
+
+### Write Data
+Following are different variants to write data into Iceberg tables:
+- `dataset.writeTo(icebergTable).append()`: Appends the Spark Dataset into Iceberg table. The Table must exist before this operation.
+  If the output table does not exist, this operation will fail with `CannotAppendMissingTableException`.
+- `dataset.writeTo(icebergTable).replace()`: Replace an existing table with the contents of the data frame.
+  The existing table's schema, partition layout, properties, and other configuration will be replaced with the contents of the data frame and the configuration set on this writer.
+  If the output table does not exist, this operation will fail with `CannotReplaceMissingTableException`.
+- `dataset.writeTo(icebergTable).create()`: Create a new table from the contents of the data frame.
+  The new table's schema, partition layout, properties, and other configuration will be based on the configuration set on this writer.
+  If the output table exists, this operation will fail with `TableAlreadyExistsException`.
+- `dataset.writeTo(icebergTable).createOrReplace()`: Create a new table or replace an existing table with the contents of the data frame.
+  The output table's schema, partition layout, properties, and other configuration will be based on the contents of the data frame and the configuration set on this writer. If the table exists, its configuration and data will be replaced.
+
+### Read Data
+```java
+Dataset<Row> dataset =
+    this.sparkSession.read().format("iceberg").table(tableName);
+```
+
+> [!IMPORTANT]
+> While performing operations on Iceberg tables, the given table name is prefixed with namespace.  
+> For example, if the table name is `my_table` and the namespace is `ksoot`, then the table name will be `ksoot.my_table`.  
+> This is internally handled in classes `IcebergCatalogClient` and `SparkIcebergService`, so in methods exposed by these services, you can just pass the table name without namespace prefix.
 
 #### Manual
 All these services can be installed locally on your machine, and should be accessible at above-mentioned urls and credentials (wherever applicable).

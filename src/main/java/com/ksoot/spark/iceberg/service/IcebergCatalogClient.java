@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class IcebergClient {
+public class IcebergCatalogClient {
 
   private final Catalog catalog;
 

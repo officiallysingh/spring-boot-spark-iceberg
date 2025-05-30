@@ -4,7 +4,7 @@ import static com.ksoot.spark.iceberg.util.Constants.TABLE_NAME_CUSTOMER_DAILY_P
 import static com.ksoot.spark.iceberg.util.Constants.TABLE_NAME_DRIVER_HOURLY_STATS;
 
 import com.ksoot.spark.iceberg.model.IcebergField;
-import com.ksoot.spark.iceberg.service.IcebergClient;
+import com.ksoot.spark.iceberg.service.IcebergCatalogClient;
 import com.ksoot.spark.iceberg.service.SparkIcebergDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SparkIcebergController {
 
-  private final IcebergClient icebergClient;
+  private final IcebergCatalogClient icebergCatalogClient;
 
   private final SparkIcebergDataService sparkIcebergDataService;
 
@@ -42,11 +42,11 @@ public class SparkIcebergController {
       })
   @DeleteMapping("/tables")
   ResponseEntity<String> deleteTables() {
-    if (this.icebergClient.tableExists(TABLE_NAME_DRIVER_HOURLY_STATS)) {
-      this.icebergClient.dropTable(TABLE_NAME_DRIVER_HOURLY_STATS);
+    if (this.icebergCatalogClient.tableExists(TABLE_NAME_DRIVER_HOURLY_STATS)) {
+      this.icebergCatalogClient.dropTable(TABLE_NAME_DRIVER_HOURLY_STATS);
     }
-    if (this.icebergClient.tableExists(TABLE_NAME_CUSTOMER_DAILY_PROFILE)) {
-      this.icebergClient.dropTable(TABLE_NAME_CUSTOMER_DAILY_PROFILE);
+    if (this.icebergCatalogClient.tableExists(TABLE_NAME_CUSTOMER_DAILY_PROFILE)) {
+      this.icebergCatalogClient.dropTable(TABLE_NAME_CUSTOMER_DAILY_PROFILE);
     }
     return ResponseEntity.ok(
         "Iceberg Tables: "
@@ -69,7 +69,7 @@ public class SparkIcebergController {
   ResponseEntity<String> createOrUpdateTables() {
 
     Table driverStatsTable =
-        icebergClient.createOrUpdateTable(
+        icebergCatalogClient.createOrUpdateTable(
             TABLE_NAME_DRIVER_HOURLY_STATS,
             Set.of(IcebergField.required("driver_id", Types.LongType.get())),
             "event_timestamp",
@@ -80,7 +80,7 @@ public class SparkIcebergController {
                 IcebergField.optional("avg_daily_trips", Types.IntegerType.get())));
 
     Table customerProfileTable =
-        icebergClient.createOrUpdateTable(
+        icebergCatalogClient.createOrUpdateTable(
             TABLE_NAME_CUSTOMER_DAILY_PROFILE,
             Set.of(IcebergField.required("customer_id", Types.LongType.get())),
             "event_timestamp",
@@ -109,7 +109,7 @@ public class SparkIcebergController {
       })
   @GetMapping("/tables/print-schema")
   ResponseEntity<List<String>> printSchema() {
-    Table driverStatsTable = this.icebergClient.loadTable(TABLE_NAME_DRIVER_HOURLY_STATS);
+    Table driverStatsTable = this.icebergCatalogClient.loadTable(TABLE_NAME_DRIVER_HOURLY_STATS);
     String schemaRepresentationDriverStatsTable = driverStatsTable.schema().toString();
     System.out.println(
         "Schema Representation of Table "
@@ -117,7 +117,8 @@ public class SparkIcebergController {
             + ": "
             + schemaRepresentationDriverStatsTable);
 
-    Table customerProfilesTable = this.icebergClient.loadTable(TABLE_NAME_CUSTOMER_DAILY_PROFILE);
+    Table customerProfilesTable =
+        this.icebergCatalogClient.loadTable(TABLE_NAME_CUSTOMER_DAILY_PROFILE);
     String schemaRepresentationCustomerProfilesTable = customerProfilesTable.schema().toString();
     System.out.println(
         "Schema Representation of Table "

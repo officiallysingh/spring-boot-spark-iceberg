@@ -16,7 +16,7 @@ public class SparkIcebergDataService {
 
   private final SparkSession sparkSession;
 
-  private final IcebergClient icebergClient;
+  private final IcebergCatalogClient icebergCatalogClient;
 
   private final DriverHourlyStatsGenerator driverHourlyStatsGenerator;
 
@@ -82,6 +82,6 @@ public class SparkIcebergDataService {
   }
 
   private String icebergTableName(final String tableName) {
-    return this.icebergClient.getCatalogProperties().tablePrefix() + tableName;
+    return this.icebergCatalogClient.getCatalogProperties().tablePrefix() + tableName;
   }
 }
