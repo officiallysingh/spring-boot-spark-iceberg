@@ -192,11 +192,11 @@ spark:
 
   sql:
     catalog:
-      hadoop.warehouse: ${CATALOG_WAREHOUSE:s3a://${AWS_BUCKET:ksoot-iceberg}/warehouse}
+      hadoop.warehouse: ${CATALOG_WAREHOUSE:s3a://${CATALOG_AWS_BUCKET:ksoot-iceberg}/warehouse}
       hadoop.io-impl: org.apache.iceberg.aws.s3.S3FileIO
-      hive.warehouse: ${CATALOG_WAREHOUSE:s3a://${AWS_BUCKET:ksoot-iceberg}/warehouse}
+      hive.warehouse: ${CATALOG_WAREHOUSE:s3a://${CATALOG_AWS_BUCKET:ksoot-iceberg}/warehouse}
       hive.io-impl: org.apache.iceberg.aws.s3.S3FileIO
-      nessie.warehouse: ${CATALOG_WAREHOUSE:s3a://${AWS_BUCKET:ksoot-iceberg}/warehouse}
+      nessie.warehouse: ${CATALOG_WAREHOUSE:s3a://${CATALOG_AWS_BUCKET:ksoot-iceberg}/warehouse}
       nessie.io-impl: org.apache.iceberg.aws.s3.S3FileIO
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
