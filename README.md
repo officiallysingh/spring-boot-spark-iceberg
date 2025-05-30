@@ -108,15 +108,12 @@ spring:
       s3:
         endpoint: ${AWS_S3_ENDPOINT:https://s3.<Your AWS Region>.amazonaws.com}
 ```
-- Update **$HIVE_HOME/conf/hive-site.xml** with following properties.
+- Update **$HIVE_HOME/conf/hive-site.xml** with following properties. It will take AWS credetials from AWS CLI configuration.
+  Replace `{Your AWS Region}` with your actual AWS region, e.g. `ap-south-1` etc.
 ```xml
     <property>
-        <name>fs.s3a.access.key</name>
-        <value>Your AWS Access Key</value>
-    </property>
-    <property>
-        <name>fs.s3a.secret.key</name>
-        <value>Your AWS Secret Key</value>
+        <name>fs.s3a.aws.credentials.provider</name>
+        <value>com.amazonaws.auth.DefaultAWSCredentialsProviderChain</value>
     </property>
     <property>
         <name>fs.s3a.endpoint</name>
