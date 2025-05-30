@@ -47,8 +47,8 @@ Iceberg can be configured to use different catalog types and storage backends. *
 ## Catalog configurations
 Following properties can be passed as VM options while running the application to choose Catalog type and Storage type. 
 For details refer to [**`application.yml`**](src/main/resources/config/application.yml) file.
-* `CATALOG_TYPE`: Type of catalog to use, can be `hadoop`, `hive` or `nessie`. e.g. `-DCATALOG_TYPE=hadoop`.
-* `STORAGE_TYPE`: Type of storage to use, can be `hadoop` or `aws-s3`. e.g. `-DSTORAGE_TYPE=hadoop` or `-DSTORAGE_TYPE=aws-s3`.
+* **CATALOG_TYPE**: Type of catalog to use, can be `hadoop`, `hive` or `nessie`. e.g. `-DCATALOG_TYPE=hadoop`.
+* **STORAGE_TYPE**: Type of storage to use, can either be `hadoop` (default) or `aws-s3`. e.g. `-DSTORAGE_TYPE=hadoop` or `-DSTORAGE_TYPE=aws-s3`.
 
 > [!IMPORTANT]
 > [Other Catalog types](https://iceberg.apache.org/docs/latest/spark-configuration/#catalog-configuration), Azure Blob Storage and Google Cloud Storage (GCS) are also supported as data storage for Iceberg tables.  
