@@ -373,7 +373,7 @@ Once the application is running, you can access [Swagger UI](http://localhost:80
 
 ![Swagger UI](https://github.com/officiallysingh/spring-boot-spark-iceberg/blob/main/img/Swagger.png)
 
-For Demo purpose, two tables `driver_hourly_stats` and `customer_daily_profile` are created in `ksoot` namespace.  
+For Demo purpose, two tables `driver_hourly_stats` and `customer_daily_profile` are created in `ksoot` namespace. 
 And data is written and read from these two tables using REST API endpoints.
 * Execute the API to create or update the tables.
 * Execute the API to print schema of the tables.
