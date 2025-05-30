@@ -330,23 +330,21 @@ To stop the services and delete volumes, execute:
 ### With Local Hadoop as Storage
 * Make sure Hadoop is installed and running on your machine as per [Hadoop Installation Guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90).
 * No need to explicitly set Storage type as `hadoop` as it is the default storage type.
-* Got to main class [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) and Modify run configurations as follows, depending on the Catalog type as follows.
+* Got to main class [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) and Modify run configurations. Set VM Options depending on the Catalog type as follows 
+and Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
 #### Hadoop Catalog
 * Set Catalog type as `hadoop` by setting VM option `-DCATALOG_TYPE=hadoop`
-* Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
 #### Hive Catalog
 * Make sure Hive Server and Hive Metastore are running as per [Hadoop & Hive Installation Guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90).
 * Make sure Postgres is running with same username and password as specified in `$HIVE_HOME/conf/hive-site.xml`.
 * Set Catalog type as `hive` by setting VM option `-DCATALOG_TYPE=hive`
-* Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
 #### Nessie Catalog
 * Make sure MongoDB and Nessie are running using docker-compose.
 * You can access Nessie UI at [http://localhost:19120/api/v2/ui](http://localhost:19120/api/v2/ui) to view the Iceberg tables.
 * Set Catalog type as `nessie` by setting VM option `-DCATALOG_TYPE=nessie`
-* Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
 ### With AWS S3 as Storage
 * Make sure the required setup for AWS S3 is complete as elaborated in [Setting up AWS S3 for Data storage section](#setting-up-aws-s3-for-data-storage).
@@ -354,24 +352,21 @@ To stop the services and delete volumes, execute:
 * Set Storage type as `aws-s3` by setting VM option `-DSTORAGE_TYPE=aws-s3`
 * Set VM option `-DCATALOG_AWS_BUCKET=<Your S3 Bucket Name>` to specify your bucket name.
 * Set VM options `-DAWS_ACCESS_KEY=<Your access key>` and `-DAWS_SECRET_KEY=<Your secret key>` to specify the AWS credentials.
-* Set Catalog type as follows.
+* Set Catalog type as follows and Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
 #### Hadoop Catalog
 * Make sure Hadoop is installed and running on your machine as per [Hadoop Installation Guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90).
 * Set Catalog type as `hadoop` by setting VM option `-DCATALOG_TYPE=hadoop`
-* Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
 #### Hive Catalog
 * Make sure Hive Server and Hive Metastore are running as per [Hadoop & Hive Installation Guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90).
 * Make sure Postgres is running with same username and password as specified in `$HIVE_HOME/conf/hive-site.xml`.
 * Set Catalog type as `hive` by setting VM option `-DCATALOG_TYPE=hive`
-* Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
 #### Nessie Catalog
 * Make sure MongoDB and Nessie are running. Confirm that Mongo connection-string is set correctly in environment variable `quarkus.mongodb.connection-string` in [compose.yml](compose.yml)'s service `nessie`. Recommended to run Mongo and Nessie using docker-compose.
 * You can access Nessie UI at `http://localhost:19120/api/v2/ui` to view the Iceberg tables.
 * Set Catalog type as `nessie` by setting VM option `-DCATALOG_TYPE=nessie`
-* Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
 ## Testing
 Once the application is running, you can access [Swagger UI](http://localhost:8090/swagger-ui/index.html) or Using [Postman Collection](Spark Iceberg.postman_collection.json).
