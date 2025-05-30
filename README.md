@@ -296,7 +296,7 @@ Dataset<Row> dataset =
 ```
 
 > [!IMPORTANT]
-> While performing operations on Iceberg tables, the given table name is prefixed with namespace.  
+> While performing operations on Iceberg tables, the given table name is prefixed with namespace. 
 > For example, if the table name is `my_table` and the namespace is `ksoot`, then the effective table name will be `ksoot.my_table`. 
 > This is internally handled in classes `IcebergCatalogClient` and `SparkIcebergService`, so in methods exposed by these services, you can just pass the table name without a namespace prefix.
 
