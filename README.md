@@ -12,16 +12,16 @@ Integrating Iceberg with Spark and Spring Boot allows you to build robust data l
 This project requires:
 
 - [Java 17](https://sdkman.io/install/)
-- [Scala 2.13.16](https://sdkman.io/install/)
+- [Scala 2.13.16](https://sdkman.io/install/). Make sure scala version is printed as `2.13.16` in terminal by executing `scala -version`.
 - [Spark 3.5.5](https://www.apache.org/dyn/closer.lua/spark/spark-3.5.5/spark-3.5.5-bin-hadoop3.tgz)
 - [Apache Hadoop](https://hadoop.apache.org/releases.html)
 - [Apache Hive 4.0.1](https://dlcdn.apache.org/hive/hive-4.0.1/apache-hive-4.0.1-bin.tar.gz)
-- [Docker](https://www.docker.com), Make sure Docker is allocated with enough resources.
+- [Docker](https://www.docker.com)
 - [Maven](https://maven.apache.org), Make sure environment variable `M2_REPO` is set to local maven repository
 - IDE (IntelliJ, Eclipse or VS Code), Recommended [IntelliJ IDEA](https://www.jetbrains.com/idea).
 - Optional [Configure Formatter in intelliJ](https://github.com/google/google-java-format/blob/master/README.md#intellij-android-studio-and-other-jetbrains-ides), refer to [fmt-maven-plugin](https://github.com/spotify/fmt-maven-plugin) for details.
 
-Recommended [sdkman](https://sdkman.io/install/) for managing Java, Scala and even Spark installations.
+**Recommended [sdkman](https://sdkman.io/install/) for managing Java, Scala and even Spark installations.**
 
 ## Features
 - **Spring Boot**: REST API layer and dependency management.
@@ -109,22 +109,23 @@ spring:
         endpoint: ${AWS_S3_ENDPOINT:https://s3.<Your AWS Region>.amazonaws.com}
 ```
 - Update **$HIVE_HOME/conf/hive-site.xml** with following properties. It will take AWS credetials from AWS CLI configuration.
-  Replace `{Your AWS Region}` with your actual AWS region, e.g. `ap-south-1` etc.
+  Replace `{Your AWS Region}` with your actual AWS region, e.g. `ap-south-1` etc. It's only required if you are using Hive Catalog with AWS S3 as storage.
 ```xml
-    <property>
-        <name>fs.s3a.aws.credentials.provider</name>
-        <value>com.amazonaws.auth.DefaultAWSCredentialsProviderChain</value>
-    </property>
-    <property>
-        <name>fs.s3a.endpoint</name>
-        <value>s3.{Your AWS Region}.amazonaws.com</value>
-    </property>
-    <property>
-        <name>fs.s3a.impl</name>
-        <value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
-    </property>
+<property>
+    <name>fs.s3a.aws.credentials.provider</name>
+    <value>com.amazonaws.auth.DefaultAWSCredentialsProviderChain</value>
+</property>
+<property>
+    <name>fs.s3a.endpoint</name>
+    <value>s3.{Your AWS Region}.amazonaws.com</value>
+</property>
+<property>
+    <name>fs.s3a.impl</name>
+    <value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
+</property>
 ```
 - Add `aws-java-sdk-bundle-1.12.262.jar`, `hadoop-aws-3.3.4.jar` and `postgresql-42.7.4.jar` to folder `$HIVE_HOME/lib`. Versions may vary, so make sure to use compatible versions with your setup.
+  It's only required if you are using Hive Catalog with AWS S3 as storage.
 - **Spark Hadoop Configurations**
   Each catalog stores some metadata regarding the tables in its own storage such as Postgres (or any other relational database) for Hive, MongoDB for Nessie etc.
   But the catalog metadata json files and table's data is stored in a distributed file system such as HDFS, S3, Azure Blob Storage or Google Cloud Storage (GCS).  
@@ -297,38 +298,113 @@ Dataset<Row> dataset =
 
 > [!IMPORTANT]
 > While performing operations on Iceberg tables, the given table name is prefixed with namespace.  
-> For example, if the table name is `my_table` and the namespace is `ksoot`, then the table name will be `ksoot.my_table`.  
+> For example, if the table name is `my_table` and the namespace is `ksoot`, then the effective table name will be `ksoot.my_table`.  
 > This is internally handled in classes `IcebergCatalogClient` and `SparkIcebergService`, so in methods exposed by these services, you can just pass the table name without a namespace prefix.
 
-#### Manual
-All these services can be installed locally on your machine, and should be accessible at above-mentioned urls and credentials (wherever applicable).
+## Running the Application
+Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application. Some configurations need to be set as VM options while running the application.  
+Also, it may need some services to be running in before starting the application depending on Catalog type and Storage type.  
+Application is bundled with [Docker Compose Support](https://www.baeldung.com/docker-compose-support-spring-boot) which is enabled when running the application in `docker` profile by setting VM option `-Dspring.profiles.active=docker`.
+Following two VM options are required irrespective of Catalog type and Storage type.
+* Go to `Modify options`, click on `Add VM options` and set the value as `--add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED`  
+  to avoid exception `Factory method 'sparkSession' threw exception with message: class org.apache.spark.storage.StorageUtils$ (in unnamed module @0x2049a9c1) cannot access class sun.nio.ch.DirectBuffer (in module java.base) because module java.base does not export sun.nio.ch to unnamed module @0x2049a9c1`
+* Go to `Modify options` and set active profile as either `local` or `docker` by setting either `-Dspring.profiles.active=local` or  `-Dspring.profiles.active=docker` respectively.
 
-#### Docker compose
-* The [compose.yml](compose.yml) file defines the services and configurations to run required infrastructure in Docker.
-* In Terminal go to project root `spring-boot-spark-kubernetes` and execute following command and confirm if all services are running.
+### Docker compose
+The Docker [compose.yml](compose.yml) file defines following services.
+* **postgres**: Required for `hive` catalog to use Postgres as its internal database. Comment out if Postgres is installed locally.
+* **mongo**: Required for `nessie` catalog to use MongoDB as its internal database. Comment out if MongoDB is installed locally.
+* **nessie**: Required for `nessie` catalog.
+* **dremio**: Optional, it can be used to browse and query the Iceberg tables.
+
+In Terminal go to project root and execute following command and confirm if required services are running.
 ```shell
-docker compose up -d
+% docker compose up -d
 ```
-* Create databases `spark_jobs_db` and `error_logs_db` in Postgres and Kafka topics `job-stop-requests` and `error-logs` if they do not exist.
-
+To stop the services and delete volumes, execute:
+```shell
+% docker compose down -v
+```
 > [!IMPORTANT]  
 > While using docker compose make sure the required ports are free on your machine, otherwise port busy error could be thrown.
 
-## Spark Configurations
+### With Local Hadoop as Storage
+* Make sure Hadoop is installed and running on your machine as per [Hadoop Installation Guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90).
+* No need to explicitly set Storage type as `hadoop` as it is the default storage type.
+* Got to main class [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) and Modify run configurations as follows, depending on the Catalog type.
 
+#### Hadoop Catalog
+* Make sure Hadoop is running.
+* Set Catalog type as `hadoop` by setting VM option `-DCATALOG_TYPE=hadoop`
+* Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
-## IntelliJ Run Configurations
+#### Hive Catalog
+* Make sure Hadoop is running.
+* Make sure Hive Server and Hive Metastore are running as per [Hadoop & Hive Installation Guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90).
+* Make sure Postgres is running with same username and password as specified in `$HIVE_HOME/conf/hive-site.xml`.
+* Set Catalog type as `hive` by setting VM option `-DCATALOG_TYPE=hive`
+* Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
+
+#### Nessie Catalog
+* Make sure Hadoop is running.
+* Make sure MongoDB and Nessie are running. Confirm that Mongo connection-string is set correctly in environment variable `quarkus.mongodb.connection-string` in [compose.yml](compose.yml)'s service `nessie`. Recommended to run Mongo and Nessie using docker-compose.
+* You can access Nessie UI at `http://localhost:19120/api/v2/ui` to view the Iceberg tables.
+* Set Catalog type as `nessie` by setting VM option `-DCATALOG_TYPE=nessie`
+* Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
+
+### With AWS S3 as Storage
+* Make sure the required setup for AWS S3 is complete as elaborated in [Setting up AWS S3 for Data storage section](#setting-up-aws-s3-for-data-storage).
 * Got to main class [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) and Modify run configurations as follows.
-* Go to `Modify options`, click on `Add VM options` and set the value as `--add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED`  
-  to avoid exception `Factory method 'sparkSession' threw exception with message: class org.apache.spark.storage.StorageUtils$ (in unnamed module @0x2049a9c1) cannot access class sun.nio.ch.DirectBuffer (in module java.base) because module java.base does not export sun.nio.ch to unnamed module @0x2049a9c1`  
-  and to Run this Spring boot application in active profile `local`.
-* Go to `Modify options` and set active profile as either `local` or `docker` by setting either `-Dspring.profiles.active=local` or  `-Dspring.profiles.active=docker` respectively.
-* Go to `Modify options` and set Catalog type as either `hadoop`, `hive` or `nessie` by setting either `-DCATALOG_TYPE=hadoop` or `-DCATALOG_TYPE=hive` or `-DCATALOG_TYPE=nessie` respectively.
-* Go to `Modify options` and make sure `Add dependencies with "provided" scope to classpath` is checked.
-* [Configure Formatter in intelliJ](https://github.com/google/google-java-format/blob/master/README.md#intellij-android-studio-and-other-jetbrains-ides), refer to [fmt-maven-plugin](https://github.com/spotify/fmt-maven-plugin) for details.
+* Set Storage type as `aws-s3` by setting VM option `-DSTORAGE_TYPE=aws-s3`
+* Set VM option `-DCATALOG_AWS_BUCKET=<Your S3 Bucket Name>` to specify your bucket name.
+* Set VM options `-DAWS_ACCESS_KEY=<Your access key>` and `-DAWS_SECRET_KEY=<Your secret key>` to specify the AWS credentials.
+* Set Catalog type as follows.
 
-Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
+#### Hadoop Catalog
+* Make sure Hadoop is installed and running on your machine as per [Hadoop Installation Guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90).
+* Set Catalog type as `hadoop` by setting VM option `-DCATALOG_TYPE=hadoop`
+* Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
+#### Hive Catalog
+* Make sure Hive Server and Hive Metastore are running as per [Hadoop & Hive Installation Guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90).
+* Make sure Postgres is running with same username and password as specified in `$HIVE_HOME/conf/hive-site.xml`.
+* Set Catalog type as `hive` by setting VM option `-DCATALOG_TYPE=hive`
+* Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
-> [!IMPORTANT]
-> Its imp.
+#### Nessie Catalog
+* Make sure MongoDB and Nessie are running. Confirm that Mongo connection-string is set correctly in environment variable `quarkus.mongodb.connection-string` in [compose.yml](compose.yml)'s service `nessie`. Recommended to run Mongo and Nessie using docker-compose.
+* You can access Nessie UI at `http://localhost:19120/api/v2/ui` to view the Iceberg tables.
+* Set Catalog type as `nessie` by setting VM option `-DCATALOG_TYPE=nessie`
+* Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
+
+## Testing
+Once the application is running, you can access [Swagger UI](http://localhost:8090/swagger-ui/index.html) or Using [Postman Collection](Spark Iceberg.postman_collection.json).
+
+![Swagger UI](https://github.com/officiallysingh/spring-boot-spark-iceberg/blob/main/img/Swagger.png)
+
+For Demo purpose, two tables `driver_hourly_stats` and `customer_daily_profile` are created in `ksoot` namespace.  
+And data is written and read from these two tables using REST API endpoints.
+* Execute the API to create or update the tables.
+* Execute the API to print schema of the tables.
+* Execute the API to write data to the tables.
+* Execute the API to read data from the tables.
+* Execute the API to delete the tables if you want to clean up.
+
+## Licence
+Open source [**The MIT License**](http://www.opensource.org/licenses/mit-license.php)
+
+## Author
+[**Rajveer Singh**](https://www.linkedin.com/in/rajveer-singh-589b3950/), In case you find any issues or need any support, please email me at raj14.1984@gmail.com.
+Give it a :star: on [Github](https://github.com/officiallysingh/spring-boot-spark-iceberg) and a :clap: on [**medium.com**](https://officiallysingh.medium.com/spark-spring-boot-starter-e206def765b9) if you find it helpful.
+
+## References
+- [Spring boot starter for Spark](https://github.com/officiallysingh/spring-boot-starter-spark).
+- [Apache Hadoop and Hive installation guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90) for details on how to install Hadoop and Hive.
+- To know about Spark Refer to [**Spark Documentation**](https://spark.apache.org/docs/latest/).
+- Find all Spark Configurations details at [**Spark Configuration Documentation**](https://spark.apache.org/docs/latest/configuration.html)
+- [Apache Iceberg](https://iceberg.apache.org/docs/nightly/)
+- [Apache Iceberg Spark Quickstart](https://iceberg.apache.org/docs/1.9.0/java-api-quickstart/)
+- [Apache Hadoop](https://hadoop.apache.org/)
+- [Apache Hive](https://hive.apache.org/)
+- [Nessie](https://projectnessie.org/iceberg/iceberg/)
+- [Exception handling in Spring boot Web applications](https://github.com/officiallysingh/spring-boot-problem-handler).
