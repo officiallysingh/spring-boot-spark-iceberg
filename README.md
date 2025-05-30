@@ -297,14 +297,14 @@ Dataset<Row> dataset =
 
 > [!IMPORTANT]
 > While performing operations on Iceberg tables, the given table name is prefixed with namespace.  
-> For example, if the table name is `my_table` and the namespace is `ksoot`, then the effective table name will be `ksoot.my_table`.  
+> For example, if the table name is `my_table` and the namespace is `ksoot`, then the effective table name will be `ksoot.my_table`. 
 > This is internally handled in classes `IcebergCatalogClient` and `SparkIcebergService`, so in methods exposed by these services, you can just pass the table name without a namespace prefix.
 
 ## Running the Application
-Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application. Some configurations need to be set as VM options while running the application.  
-Also, it may need some services to be running in before starting the application depending on Catalog type and Storage type.  
+Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application. Some configurations need to be set as VM options while running the application. 
+Also, it may need some services to be running in before starting the application depending on Catalog type and Storage type. 
 Application is bundled with [Docker Compose Support](https://www.baeldung.com/docker-compose-support-spring-boot) which is enabled when running the application in `docker` profile by setting VM option `-Dspring.profiles.active=docker`.
-Following two VM options are required irrespective of Catalog type and Storage type.
+Following two VM options are always required.
 * Go to `Modify options`, click on `Add VM options` and set the value as `--add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED`  
   to avoid exception `Factory method 'sparkSession' threw exception with message: class org.apache.spark.storage.StorageUtils$ (in unnamed module @0x2049a9c1) cannot access class sun.nio.ch.DirectBuffer (in module java.base) because module java.base does not export sun.nio.ch to unnamed module @0x2049a9c1`
 * Go to `Modify options` and set active profile as either `local` or `docker` by setting either `-Dspring.profiles.active=local` or  `-Dspring.profiles.active=docker` respectively.
