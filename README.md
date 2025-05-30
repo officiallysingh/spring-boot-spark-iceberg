@@ -330,7 +330,7 @@ To stop the services and delete volumes, execute:
 ### With Local Hadoop as Storage
 * Make sure Hadoop is installed and running on your machine as per [Hadoop Installation Guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90).
 * No need to explicitly set Storage type as `hadoop` as it is the default storage type.
-* Got to main class [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) and Modify run configurations as follows, depending on the Catalog type.
+* Got to main class [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) and Modify run configurations as follows, depending on the Catalog type as follows.
 
 #### Hadoop Catalog
 * Make sure Hadoop is running.
