@@ -35,8 +35,7 @@ This project requires:
 > **Refer to** [**Apache Hadoop and Hive installation guide**](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90) **for details on how to install Hadoop and Hive**.
 
 ## Iceberg
-Iceberg can be configured to use different catalog types and storage backends.  
-**This demo has been tested to use following three catalog types**:
+Iceberg can be configured to use different catalog types and storage backends. **This demo has been tested to use following three catalog types**:
 * [**`HadoopCatalog`**](https://iceberg.apache.org/docs/1.9.0/java-api-quickstart/#using-a-hadoop-catalog).
 * [**`HiveCatalog`**](https://iceberg.apache.org/docs/1.9.0/java-api-quickstart/#using-a-hive-catalog).
 * [**`NessieCatalog`**](https://iceberg.apache.org/docs/1.9.0/nessie/).
@@ -46,7 +45,7 @@ Iceberg can be configured to use different catalog types and storage backends.
 * AWS S3.
 
 ## Catalog configurations
-Following properties can be passed as VM options while running the application to choose Catalog type and Storage type.  
+Following properties can be passed as VM options while running the application to choose Catalog type and Storage type. 
 For details refer to [**`application.yml`**](src/main/resources/config/application.yml) file.
 * `**CATALOG_TYPE**`: Type of catalog to use, can be `hadoop`, `hive` or `nessie`. e.g. `-DCATALOG_TYPE=hadoop`.
 * `**STORAGE_TYPE**`: Type of storage to use, can be `hadoop` or `aws-s3`. e.g. `-DSTORAGE_TYPE=hadoop` or `-DSTORAGE_TYPE=aws-s3`.
