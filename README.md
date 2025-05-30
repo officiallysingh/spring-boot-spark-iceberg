@@ -344,7 +344,7 @@ To stop the services and delete volumes, execute:
 
 #### Nessie Catalog
 * Make sure MongoDB and Nessie are running using docker-compose.
-* You can access Nessie UI at `http://localhost:19120/api/v2/ui` to view the Iceberg tables.
+* You can access Nessie UI at [http://localhost:19120/api/v2/ui](http://localhost:19120/api/v2/ui) to view the Iceberg tables.
 * Set Catalog type as `nessie` by setting VM option `-DCATALOG_TYPE=nessie`
 * Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/SparkIcebergApplication.java) as Spring boot application.
 
