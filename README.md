@@ -125,7 +125,7 @@ spring:
 ```
 - Add `aws-java-sdk-bundle-1.12.262.jar`, `hadoop-aws-3.3.4.jar` and `postgresql-42.7.4.jar` to folder `$HIVE_HOME/lib`. Versions may vary, so make sure to use compatible versions with your setup.
   It's only required if you are using Hive Catalog with AWS S3 as storage.
-- **Spark Hadoop Configurations**
+- **Spark Hadoop Configurations**: 
   Each catalog stores some metadata regarding the tables in its own storage such as Postgres (or any other relational database) for Hive, MongoDB for Nessie etc.
   But the catalog metadata json files and table's data is stored in a distributed file system such as HDFS, S3, Azure Blob Storage or Google Cloud Storage (GCS).  
   **So you need to set Spark Hadoop configurations, either you can configure them globally as follows, which will be used by all Catalogs configured in your application.**
