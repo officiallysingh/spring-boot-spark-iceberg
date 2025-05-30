@@ -176,7 +176,7 @@ spark:
       hadoop.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
 ```
 
-For Storage type Local Hadoop
+**For Storage type Local Hadoop**
 ```yaml
 spark:
   sql:
@@ -185,7 +185,7 @@ spark:
       hadoop.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
 ```
 
-For Storage type AWS S3
+**For Storage type AWS S3**
 ```yaml
 spark:
   sql:
@@ -206,7 +206,7 @@ spark:
       hive.default-namespace: ${CATALOG_NAMESPACE:ksoot}
 ```
 
-For Storage type Local Hadoop
+**For Storage type Local Hadoop**
 ```yaml
 spark:
   sql:
@@ -215,7 +215,7 @@ spark:
       hive.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
 ```
 
-For Storage type AWS S3
+**For Storage type AWS S3**
 ```yaml
 spark:
   sql:
@@ -236,7 +236,7 @@ spark:
       nessie.default-namespace: ${CATALOG_NAMESPACE:ksoot}
 ```
 
-For Storage type Local Hadoop
+**For Storage type Local Hadoop**
 ```yaml
 spark:
   sql:
@@ -245,7 +245,7 @@ spark:
       nessie.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
 ```
 
-For Storage type AWS S3
+**For Storage type AWS S3**
 ```yaml
 spark:
   sql:
