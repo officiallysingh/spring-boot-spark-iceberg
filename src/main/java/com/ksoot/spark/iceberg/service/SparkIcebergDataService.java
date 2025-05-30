@@ -22,6 +22,8 @@ public class SparkIcebergDataService {
 
   private final CustomerDailyProfileGenerator customerDailyProfileGenerator;
 
+  private final SparkIcebergService sparkIcebergService;
+
   // Number of Drivers to generate data for
   private static final int DRIVERS_COUNT = 5;
 
@@ -32,33 +34,16 @@ public class SparkIcebergDataService {
   // 180 days means generate data for the last 6 months
   private static final int DURATION_DAYS = 30;
 
-  public void writeData() {
-    //    IcebergClient icebergClient = this.icebergClientProvider.getIfAvailable();
-    //    if(Objects.nonNull(icebergClient)) {
-    //      Table driverHourlyStatsTable = icebergClient.loadTable(TABLE_NAME_DRIVER_HOURLY_STATS);
-    //      System.out.println(driverHourlyStatsTable);
-    //    } else {
-    //      System.out.println("The Iceberg Client is not available");
-    //    }
-    try {
-      //              this.testWriteIceberg();
-      this.writeDriversHourlyStatsData();
-      this.writeCustomersDailyProfilesData();
-    } catch (NoSuchTableException e) {
-      throw new RuntimeException(e);
-    }
+  public void writeData() throws NoSuchTableException {
+    this.writeDriversHourlyStatsData();
+    this.writeCustomersDailyProfilesData();
   }
 
   public void writeDriversHourlyStatsData() throws NoSuchTableException {
     Dataset<Row> dataset =
         this.driverHourlyStatsGenerator.generateDriverStatsDataset(DRIVERS_COUNT, DURATION_DAYS);
     SparkUtils.logDataset("Driver Stats", dataset);
-    //    dataset
-    //        .writeTo(this.icebergTableName(TABLE_NAME_DRIVER_HOURLY_STATS))
-    //        .using(PROVIDER_ICEBERG)
-    //        .createOrReplace();
-    //    dataset.writeTo(TABLE_NAME_DRIVER_HOURLY_STATS).option("format", "iceberg").append();
-    dataset.writeTo(this.icebergTableName(TABLE_NAME_DRIVER_HOURLY_STATS)).append();
+    this.sparkIcebergService.appendData(dataset, TABLE_NAME_DRIVER_HOURLY_STATS);
   }
 
   public void writeCustomersDailyProfilesData() throws NoSuchTableException {
@@ -66,22 +51,11 @@ public class SparkIcebergDataService {
         this.customerDailyProfileGenerator.generateDriverStatsDataset(
             CUSTOMERS_COUNT, DURATION_DAYS);
     SparkUtils.logDataset("Customer Profiles", dataset);
-    dataset
-        .writeTo(this.icebergTableName(TABLE_NAME_CUSTOMER_DAILY_PROFILE))
-        .using(PROVIDER_ICEBERG)
-        .createOrReplace();
-    //    dataset.writeTo(TABLE_NAME_CUSTOMER_DAILY_PROFILE).option("format", "iceberg").append();
-    //    dataset.writeTo(this.icebergTableName(TABLE_NAME_CUSTOMER_DAILY_PROFILE)).option("format",
-    // "iceberg").append();
+    this.sparkIcebergService.appendData(dataset, TABLE_NAME_CUSTOMER_DAILY_PROFILE);
   }
 
   public void readData(final String tableName) {
-    Dataset<Row> dataset =
-        this.sparkSession.read().format(PROVIDER_ICEBERG).table(this.icebergTableName(tableName));
+    Dataset<Row> dataset = this.sparkIcebergService.read(tableName);
     SparkUtils.logDataset(tableName, dataset);
-  }
-
-  private String icebergTableName(final String tableName) {
-    return this.icebergCatalogClient.getCatalogProperties().tablePrefix() + tableName;
   }
 }

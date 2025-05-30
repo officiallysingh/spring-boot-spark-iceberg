@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.types.Types;
+import org.apache.spark.sql.catalyst.analysis.NoSuchTableException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -139,7 +140,7 @@ public class SparkIcebergController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
       })
   @PostMapping("/tables/write-data")
-  ResponseEntity<String> writeDate() {
+  ResponseEntity<String> writeDate() throws NoSuchTableException {
     this.sparkIcebergDataService.writeData();
     return ResponseEntity.ok(
         "Data ingested into Iceberg Tables: "
