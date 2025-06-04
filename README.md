@@ -386,7 +386,7 @@ Open source [**The MIT License**](http://www.opensource.org/licenses/mit-license
 
 ## Author
 [**Rajveer Singh**](https://www.linkedin.com/in/rajveer-singh-589b3950/), In case you find any issues or need any support, please email me at raj14.1984@gmail.com.
-Give it a :star: on [Github](https://github.com/officiallysingh/spring-boot-spark-iceberg) and a :clap: on [**medium.com**](https://officiallysingh.medium.com/spark-spring-boot-starter-e206def765b9) if you find it helpful.
+Give it a :star: on Github and a :clap: on [**medium.com**](https://medium.com/@officiallysingh/spring-boot-spark-and-iceberg-integration-17156b407746) if you find it helpful.
 
 ## References
 - [Spring boot starter for Spark](https://github.com/officiallysingh/spring-boot-starter-spark).
