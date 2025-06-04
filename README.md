@@ -1,4 +1,12 @@
 # Spring Boot Spark integration with Apache Iceberg Data Lakehouse
+
+[![Java](https://img.shields.io/badge/java-17-blue.svg)](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
+[![Spring Boot](https://img.shields.io/badge/spring_boot-3.4.5-blue.svg)](https://spring.io/projects/spring-boot)
+[![Apache Spark](https://img.shields.io/badge/spark-3.5.5-blue.svg)](https://spark.apache.org/)
+[![Maven](https://img.shields.io/badge/maven-3.9.5-blue.svg)](https://maven.apache.org/)
+[![MongoDB](https://img.shields.io/badge/mongodb-6.0.6-blue.svg)](https://www.mongodb.com/)
+[![Docker](https://img.shields.io/badge/docker-20.10.24-blue.svg)](https://www.docker.com/)
+
 Apache Iceberg is a high-performance table format for huge analytic datasets, enabling ACID operations (create, update, delete) and supporting time travel, schema evolution, and efficient data ingestion.  
 Integrating Iceberg with Spark and Spring Boot allows you to build robust data lake applications with modern engineering practices.
 
