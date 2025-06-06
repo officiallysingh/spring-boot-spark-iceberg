@@ -346,7 +346,10 @@ and Run [**SparkIcebergApplication**](src/main/java/com/ksoot/spark/iceberg/Spar
 * Set Catalog type as `hadoop` by setting VM option `-DCATALOG_TYPE=hadoop`
 
 #### Hive Catalog
-* Make sure Hive Server and Hive Metastore are running as per [Hadoop & Hive Installation Guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90).
+* Make sure _**Hive Metastore**_ is running as per [Hadoop & Hive Installation Guide](https://medium.com/@officiallysingh/install-apache-hadoop-and-hive-on-mac-m3-7933e509da90) by executing the following command.
+```shell
+% hive --service metastore --hiveconf hive.root.logger=INFO,console
+```
 * Make sure Postgres is running with same username and password as specified in `$HIVE_HOME/conf/hive-site.xml`.
 * Set Catalog type as `hive` by setting VM option `-DCATALOG_TYPE=hive`
 
