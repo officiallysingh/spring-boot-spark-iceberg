@@ -151,12 +151,20 @@ spark:
 spring.config.activate.on-profile: hadoop-storage
 #----------------- Hadoop configurations ----------------
 spark:
+  hadoop:
+    dfs:
+      replication: 1
+      namenode.replication.min: 1
+      client.use.datanode.hostname: true
   sql:
     catalog:
       hadoop.warehouse: ${CATALOG_WAREHOUSE:hdfs://localhost:9000/warehouse}
       hadoop.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
       hive.warehouse: ${CATALOG_WAREHOUSE:/user/hive/warehouse}
       hive.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
+#      hive.hadoop.dfs.replication: 1
+#      hive.hadoop.dfs.namenode.replication.min: 1
+#      hive.hadoop.dfs.client.use.datanode.hostname: true
       nessie.warehouse: ${CATALOG_WAREHOUSE:hdfs://localhost:9000/warehouse}
       nessie.io-impl: org.apache.iceberg.hadoop.HadoopFileIO
 
