@@ -1,0 +1,187 @@
+services:
+
+  atlas:
+    image: officiallysingh/atlas:latest
+    container_name: atlas
+    hostname: atlas.example.com
+    stdin_open: true
+    tty: true
+    networks:
+      - atlas
+    volumes:
+      - ./data:/home/atlas/data
+    ports:
+      - "21000:21000"
+    depends_on:
+      atlas-hbase:
+        condition: service_started
+      atlas-kafka:
+        condition: service_started
+      atlas-solr:
+        condition: service_started
+      atlas-zk:
+        condition: service_started
+    environment:
+      - ATLAS_SERVER_JAVA_VERSION
+      - ATLAS_VERSION
+    command:
+      - /home/atlas/scripts/atlas.sh
+
+  atlas-hadoop:
+    image: officiallysingh/atlas-hadoop:latest
+    container_name: atlas-hadoop
+    hostname: atlas-hadoop.example.com
+    stdin_open: true
+    tty: true
+    networks:
+      - atlas
+    ports:
+      - "9000:9000"
+      - "9870:9870"
+      - "8088:8088"
+      - "9864:9864"  # DataNode Web UI
+      - "9866:9866"  # DataNode secure data transfer
+      - "9867:9867"  # DataNode data transfer
+#    depends_on:
+#      - atlas-base
+    healthcheck:
+      test: "hdfs dfs -ls /"
+      interval: 1m30s
+      timeout: 10s
+      retries: 30
+      start_period: 40s
+    environment:
+      - HADOOP_VERSION
+    volumes:
+      - ./atlas/config/hadoop/atlas-hadoop-custom.sh:/home/atlas/scripts/atlas-hadoop-custom.sh
+
+  atlas-hbase:
+    image: officiallysingh/atlas-hbase:latest
+    container_name: atlas-hbase
+    hostname: atlas-hbase.example.com
+    stdin_open: true
+    tty: true
+    networks:
+      - atlas
+    ports:
+      - "16000:16000"
+      - "16010:16010"
+      - "16020:16020"
+      - "16030:16030"
+    depends_on:
+      atlas-hadoop:
+        condition: service_healthy
+      atlas-zk:
+        condition: service_started
+      atlas-kafka:
+        condition: service_started
+    environment:
+      - HBASE_VERSION
+      - ATLAS_VERSION
+#    volumes:
+#      - ./atlas/config/hbase/atlas-hbase-custom.sh:/home/atlas/scripts/atlas-hbase-custom.sh
+
+  atlas-hive:
+    image: officiallysingh/atlas-hive:latest
+    container_name: atlas-hive
+    hostname: atlas-hive.example.com
+    stdin_open: true
+    tty: true
+    networks:
+      - atlas
+    ports:
+      - "10000:10000"
+      - "10002:10002"
+      - "9083:9083"
+    depends_on:
+      atlas-db:
+        condition: service_started
+      atlas-hadoop:
+        condition: service_healthy
+      atlas-zk:
+        condition: service_started
+      atlas-kafka:
+        condition: service_started
+    environment:
+      - HIVE_HADOOP_VERSION
+      - HIVE_VERSION
+      - ATLAS_VERSION
+    volumes:
+      - ./atlas/config/hive/atlas-hive-custom.sh:/home/atlas/scripts/atlas-hive-custom.sh
+
+  atlas-db:
+    image: officiallysingh/atlas-db:latest
+    container_name: atlas-db
+    hostname: atlas-db.example.com
+    ports:
+      - "5432:5432"
+    networks:
+      - atlas
+
+  atlas-zk:
+    image: officiallysingh/atlas-zk:latest
+    container_name: atlas-zk
+    hostname: atlas-zk.example.com
+    networks:
+      - atlas
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_SERVERS: atlas-zk:2888:3888
+
+  atlas-solr:
+    image: officiallysingh/atlas-solr:latest
+    container_name: atlas-solr
+    hostname: atlas-solr.example.com
+    networks:
+      - atlas
+    ports:
+      - "8983:8983"
+
+  atlas-kafka:
+    image: officiallysingh/atlas-kafka:latest
+    container_name: atlas-kafka
+    hostname: atlas-kafka.example.com
+    stdin_open: true
+    tty: true
+    networks:
+      - atlas
+    ports:
+      - "9092:9092"
+    depends_on:
+      atlas-zk:
+        condition: service_started
+    environment:
+      - KAFKA_VERSION
+      - ATLAS_VERSION
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=atlas-zk:2181
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT, DIFFERENTNETWORK:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_LISTENERS=INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:9092,DIFFERENTNETWORK://0.0.0.0:9092
+      - KAFKA_ADVERTISED_LISTENERS=EXTERNAL://localhost:9092,INTERNAL://atlas-kafka:9092, DIFFERENTNETWORK://host.docker.internal:9092
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - ALLOW_PLAINTEXT_LISTENER=true
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8100:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=atlas-kafka:9092
+      - KAFKA_CLUSTERS_0_ZOOKEEPER=atlas-zk:2181
+      - KAFKA_BROKERCONNECT=atlas-kafka:9092
+      - DYNAMIC_CONFIG_ENABLED=true
+    networks:
+      - atlas
+    depends_on:
+      - atlas-kafka
+      - atlas-zk
+
+networks:
+  atlas:
+    name: atlasnw
