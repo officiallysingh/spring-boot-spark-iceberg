@@ -2,4 +2,4 @@
 
 echo "Executing custom commands for Atlas Hive..."
 # Execute custom Hive setup script for Atlas Hive
-chown -R <your local username>:hadoop /opt/hive/
+chown -R rajveersingh:hadoop /opt/hive/

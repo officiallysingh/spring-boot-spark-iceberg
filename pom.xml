@@ -29,6 +29,7 @@
         <scala.compact.version>2.13</scala.compact.version>
         <spark.version>3.5.5</spark.version>
         <spark.compact.version>3.5</spark.compact.version>
+        <apache-atlas.version>2.4.0</apache-atlas.version>
         <!-- The Following two versions must be specified otherwise you will get exception java.lang.ClassNotFoundException: javax.servlet.http.HttpServlet-->
         <jakarta-servlet.version>4.0.3</jakarta-servlet.version>
         <jersey.version>2.36</jersey.version>
@@ -120,16 +121,55 @@
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
 
-<!--        Uncomment following in case you want to store data into AWS S3 bucket-->
-<!--        <dependency>-->
-<!--            <groupId>io.awspring.cloud</groupId>-->
-<!--            <artifactId>spring-cloud-aws-starter-s3</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>software.amazon.awssdk</groupId>-->
-<!--            <artifactId>bundle</artifactId>-->
-<!--            <version>${aws-java-sdk.version}</version>-->
-<!--        </dependency>-->
+        <!-- Data Lakehouse dependencies -->
+        <dependency>
+            <groupId>io.github.officiallysingh</groupId>
+            <artifactId>spring-boot-starter-spark</artifactId>
+            <version>${spring-boot-starter-spark.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.atlas</groupId>
+            <artifactId>atlas-client-common</artifactId>
+            <version>${apache-atlas.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.atlas</groupId>
+            <artifactId>atlas-common</artifactId>
+            <version>${apache-atlas.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-text</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.atlas</groupId>
+            <artifactId>atlas-client-v2</artifactId>
+            <version>${apache-atlas.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.atlas</groupId>
+            <artifactId>atlas-intg</artifactId>
+            <version>${apache-atlas.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+
+        <!-- Uncomment following in case you want to store data into AWS S3 bucket-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.awspring.cloud</groupId>-->
+        <!--            <artifactId>spring-cloud-aws-starter-s3</artifactId>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>software.amazon.awssdk</groupId>-->
+        <!--            <artifactId>bundle</artifactId>-->
+        <!--            <version>${aws-java-sdk.version}</version>-->
+        <!--        </dependency>-->
 
         <!-- Misc dependencies -->
         <dependency>
@@ -165,12 +205,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.github.officiallysingh</groupId>
-            <artifactId>spring-boot-starter-spark</artifactId>
-            <version>${spring-boot-starter-spark.version}</version>
         </dependency>
 
         <!-- Test dependencies -->

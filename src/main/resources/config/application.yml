@@ -72,12 +72,20 @@ logging:
   level:
     ROOT: info
 #    '[org.mongodb.driver]': warn
+    '[org.apache.atlas]': debug
 debug: false
 
 # ===================================================================
 # Application specific properties
 # Add your own application properties here
 # ===================================================================
+
+#------------------------- Atlas configurations -------------------------
+atlas:
+  url: http://localhost:21000
+  username: admin
+  password: atlasR0cks!
+  enableTLS: false
 
 #------------------------- Spark configurations -------------------------
 spark:

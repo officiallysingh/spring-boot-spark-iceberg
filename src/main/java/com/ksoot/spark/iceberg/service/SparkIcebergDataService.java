@@ -3,6 +3,7 @@ package com.ksoot.spark.iceberg.service;
 import static com.ksoot.spark.iceberg.util.Constants.*;
 
 import com.ksoot.spark.iceberg.util.SparkUtils;
+import com.ksoot.spark.util.SparkOptions;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -36,7 +37,7 @@ public class SparkIcebergDataService {
 
   public void writeData() throws NoSuchTableException {
     this.writeDriversHourlyStatsData();
-    this.writeCustomersDailyProfilesData();
+//    this.writeCustomersDailyProfilesData();
   }
 
   public void writeDriversHourlyStatsData() throws NoSuchTableException {
@@ -44,6 +45,21 @@ public class SparkIcebergDataService {
         this.driverHourlyStatsGenerator.generateDriverStatsDataset(DRIVERS_COUNT, DURATION_DAYS);
     SparkUtils.logDataset("Driver Stats", dataset);
     this.sparkIcebergService.appendData(dataset, TABLE_NAME_DRIVER_HOURLY_STATS);
+  }
+
+  public void dumpDriversHourlyStatsData() {
+    Dataset<Row> dataset =
+        this.driverHourlyStatsGenerator.generateDriverStatsDataset(DRIVERS_COUNT, DURATION_DAYS);
+    SparkUtils.logDataset("Driver Stats", dataset);
+    dataset.coalesce(1).write().option(SparkOptions.Common.HEADER, true)
+            .csv("driver-stats.csv");
+  }
+
+  public void executeSparkPipeline() throws NoSuchTableException {
+    Dataset<Row> dataset = this.sparkSession.read().option(SparkOptions.Common.HEADER, true).csv("data/driver_stats.csv");
+    final String schema = dataset.schema().treeString();
+    SparkUtils.logDataset("Driver Stats", dataset);
+//    this.sparkIcebergService.appendData(dataset, TABLE_NAME_DRIVER_HOURLY_STATS);
   }
 
   public void writeCustomersDailyProfilesData() throws NoSuchTableException {
