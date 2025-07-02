@@ -1,7 +1,7 @@
 package com.ksoot.spark.iceberg.service;
 
 import com.ksoot.spark.iceberg.util.FakerUtils;
-import com.ksoot.spark.iceberg.util.SparkUtils;
+import com.ksoot.spark.util.SparkUtils;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -32,7 +32,11 @@ public class SparkIcebergService {
       throws NoSuchTableException {
     Assert.hasText(tableName, "'tableName' is required");
     final String icebergTable = this.icebergTableName(tableName);
-    dataset.writeTo(icebergTable).append();
+    dataset
+        .writeTo(icebergTable)
+        .option("distribution-mode", "none")
+        .option("fanout-enabled", "true")
+        .append();
   }
 
   /**

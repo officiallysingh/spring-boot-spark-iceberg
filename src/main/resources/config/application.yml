@@ -86,6 +86,16 @@ atlas:
   username: admin
   password: atlasR0cks!
   enableTLS: false
+  cluster.name: primary
+  debug.properties: true
+  authentication.method.basic: true
+  authentication.username: admin
+  authentication.password: atlasR0cks!
+  hook.spark.column.lineage.enable: true
+  kafka.bootstrap.servers: localhost:9092
+  kafka.auto.commit.interval.ms: 1000
+  kafka.group.id: atlas
+  kafka.session.timeout.ms: 30000
 
 #------------------------- Spark configurations -------------------------
 spark:
@@ -106,6 +116,13 @@ spark:
   sql:
     datetime.java8API.enabled: true
     session.timeZone: "+05:30"
+    queryExecutionListeners: "com.hortonworks.spark.atlas.SparkAtlasEventTracker"
+  extraListeners: "com.hortonworks.spark.atlas.SparkAtlasEventTracker"
+  atlas:
+    rest.address: ${atlas.url}
+    cluster.name: primary
+    metadata.namespace: spark
+
 
 #----------------- Iceberg Catalog configurations ----------------
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -135,6 +152,7 @@ spark:
       hive.type: hive
       hive.uri: ${CATALOG_URI:thrift://localhost:9083}
       hive.default-namespace: ${CATALOG_NAMESPACE:ksoot}
+      hive.write.distribution-mode: none
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  Add VM Argument -DCATALOG_TYPE=nessie to activate this profile   #
